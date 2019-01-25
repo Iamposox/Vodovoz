@@ -30,6 +30,8 @@ namespace Vodovoz.Dialogs.OnlineStore
 
 		private global::Gtk.Button buttonExportToSite;
 
+		private global::Gtk.Button buttonSyncOrders;
+
 		private global::Gtk.ScrolledWindow GtkScrolledWindowErrors;
 
 		private global::Gtk.TextView textviewErrors;
@@ -169,17 +171,28 @@ namespace Vodovoz.Dialogs.OnlineStore
 			this.buttonExportToSite.CanFocus = true;
 			this.buttonExportToSite.Name = "buttonExportToSite";
 			this.buttonExportToSite.UseUnderline = true;
-			this.buttonExportToSite.Label = global::Mono.Unix.Catalog.GetString("Экспортировать на сайт");
+			this.buttonExportToSite.Label = global::Mono.Unix.Catalog.GetString("Экспортировать каталог на сайт");
 			this.hbox3.Add(this.buttonExportToSite);
 			global::Gtk.Box.BoxChild w11 = ((global::Gtk.Box.BoxChild)(this.hbox3[this.buttonExportToSite]));
 			w11.Position = 1;
 			w11.Expand = false;
 			w11.Fill = false;
-			this.vbox1.Add(this.hbox3);
-			global::Gtk.Box.BoxChild w12 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.hbox3]));
+			// Container child hbox3.Gtk.Box+BoxChild
+			this.buttonSyncOrders = new global::Gtk.Button();
+			this.buttonSyncOrders.CanFocus = true;
+			this.buttonSyncOrders.Name = "buttonSyncOrders";
+			this.buttonSyncOrders.UseUnderline = true;
+			this.buttonSyncOrders.Label = global::Mono.Unix.Catalog.GetString("Синхронизация заказов");
+			this.hbox3.Add(this.buttonSyncOrders);
+			global::Gtk.Box.BoxChild w12 = ((global::Gtk.Box.BoxChild)(this.hbox3[this.buttonSyncOrders]));
 			w12.Position = 2;
 			w12.Expand = false;
 			w12.Fill = false;
+			this.vbox1.Add(this.hbox3);
+			global::Gtk.Box.BoxChild w13 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.hbox3]));
+			w13.Position = 2;
+			w13.Expand = false;
+			w13.Fill = false;
 			// Container child vbox1.Gtk.Box+BoxChild
 			this.GtkScrolledWindowErrors = new global::Gtk.ScrolledWindow();
 			this.GtkScrolledWindowErrors.Name = "GtkScrolledWindowErrors";
@@ -191,8 +204,8 @@ namespace Vodovoz.Dialogs.OnlineStore
 			this.textviewErrors.Editable = false;
 			this.GtkScrolledWindowErrors.Add(this.textviewErrors);
 			this.vbox1.Add(this.GtkScrolledWindowErrors);
-			global::Gtk.Box.BoxChild w14 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.GtkScrolledWindowErrors]));
-			w14.Position = 3;
+			global::Gtk.Box.BoxChild w15 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.GtkScrolledWindowErrors]));
+			w15.Position = 3;
 			this.Add(this.vbox1);
 			if ((this.Child != null))
 			{
@@ -205,6 +218,7 @@ namespace Vodovoz.Dialogs.OnlineStore
 			this.entryPassword.FocusOutEvent += new global::Gtk.FocusOutEventHandler(this.OnEntryPasswordFocusOutEvent);
 			this.buttonRunToFile.Clicked += new global::System.EventHandler(this.OnButtonRunToFileClicked);
 			this.buttonExportToSite.Clicked += new global::System.EventHandler(this.OnButtonExportToSiteClicked);
+			this.buttonSyncOrders.Clicked += new global::System.EventHandler(this.OnButtonSyncOrdersClicked);
 		}
 	}
 }

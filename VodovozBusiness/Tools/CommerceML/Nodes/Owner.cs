@@ -6,13 +6,13 @@ namespace Vodovoz.Tools.CommerceML.Nodes
 {
 	public class Owner : GuidNodeBase, IXmlConvertable 
 	{
-		public Owner(Export export, Organization organization)
+		public Owner(Exchange export, Organization organization)
 		{
 			myExport = export;
 			this.organization = organization;
 		}
 
-		Export myExport;
+		Exchange myExport;
 		Organization organization;
 
 		public override Guid Guid => Guid.Parse("7632aa34-408c-48ad-a3b7-b9c732694c01");

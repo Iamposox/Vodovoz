@@ -6,7 +6,7 @@ namespace Vodovoz.Tools.CommerceML.Nodes
 {
 	public class Root: IXmlConvertable
 	{
-		Export myExport;
+		Exchange myExport;
 
 		public string Version { get; private set; }
 		public DateTime ExportDate { get; private set; }
@@ -16,7 +16,7 @@ namespace Vodovoz.Tools.CommerceML.Nodes
 
 		private RootContents Contents;
 
-		public Root(Export export, RootContents contents)
+		public Root(Exchange export, RootContents contents)
 		{
 			myExport = export;
 			Version = "2.04";
@@ -70,7 +70,7 @@ namespace Vodovoz.Tools.CommerceML.Nodes
 
         public void WriteToStream(System.IO.Stream stream)
 		{
-			using(XmlWriter writer = XmlWriter.Create(stream, Export.WriterSettings)) {
+			using(XmlWriter writer = XmlWriter.Create(stream, Exchange.WriterSettings)) {
                 GetXDocument().WriteTo(writer);
 			}
 		}

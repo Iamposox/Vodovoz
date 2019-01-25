@@ -1,10 +1,10 @@
-﻿using QS.DomainModel.UoW;
-using NHibernate.Criterion;
-using QSSupportLib;
-using System;
-using Vodovoz.Domain.Goods;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NHibernate.Criterion;
+using QS.DomainModel.UoW;
+using QSSupportLib;
+using Vodovoz.Domain.Goods;
 
 namespace Vodovoz.Repository
 {
@@ -149,6 +149,36 @@ namespace Vodovoz.Repository
 			return QueryOver.Of<Nomenclature>()
 				            .Where(n => n.ProductGroup.Id.IsIn(groupsIds));
 		}
+
+		#region Интернет магазин
+
+		public static Nomenclature GetNomenclatureByOnlineStoreGuid(IUnitOfWork uow, string guid)
+		{
+			return GetNomenclatureByOnlineStoreGuid(uow, Guid.Parse(guid));
+		}
+
+		internal static Func<IUnitOfWork, Guid, Nomenclature> GetNomenclatureByOnlineStoreGuidTestGap;
+		public static Nomenclature GetNomenclatureByOnlineStoreGuid(IUnitOfWork uow, Guid guid)
+		{
+			if(GetNomenclatureByOnlineStoreGuidTestGap != null)
+				return GetNomenclatureByOnlineStoreGuidTestGap(uow, guid);
+
+			return uow.Session.QueryOver<Nomenclature>().Where(x => x.OnlineStoreGuid == guid).SingleOrDefault();
+		}
+
+		internal static Func<IUnitOfWork, Nomenclature> GetNomenclatureForDeliveryTestGap;
+		public static Nomenclature GetNomenclatureForDelivery(IUnitOfWork uow)
+		{
+			if(GetNomenclatureForDeliveryTestGap != null)
+				return GetNomenclatureForDeliveryTestGap(uow);
+
+			var deliveryNomenclatureStr = "delivery_nomenclature_id";
+			if(!MainSupport.BaseParameters.All.ContainsKey(deliveryNomenclatureStr))
+				throw new InvalidProgramException("В параметрах базы не настроена номенклатура для 'Доставка заказа'(delivery_nomenclature_id)");
+			return uow.GetById<Nomenclature>(int.Parse(MainSupport.BaseParameters.All[deliveryNomenclatureStr]));
+		}
+
+		#endregion
 
 		public static Nomenclature GetNomenclatureToAddWithMaster(IUnitOfWork uow)
 		{

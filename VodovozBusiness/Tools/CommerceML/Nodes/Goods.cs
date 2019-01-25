@@ -11,7 +11,7 @@ namespace Vodovoz.Tools.CommerceML.Nodes
 	{
 		public IList<Nomenclature> Nomenclatures { get; private set; }
 
-		public Goods(Export export)
+		public Goods(Exchange export)
 		{
 			myExport = export;
 			myExport.OnProgressPlusOneTask("Выгружаем товары");
@@ -21,7 +21,7 @@ namespace Vodovoz.Tools.CommerceML.Nodes
             Nomenclatures.ToList().ForEach(n => n.CreateGuidIfNotExist(export.UOW));
 		}
 
-		Export myExport;
+		Exchange myExport;
 
 		public XElement ToXml()
 		{

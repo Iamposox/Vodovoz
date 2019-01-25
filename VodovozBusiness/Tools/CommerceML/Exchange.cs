@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Web;
 using System.Xml;
 using System.Xml.Linq;
 using QS.DomainModel.UoW;
@@ -13,7 +15,7 @@ using Vodovoz.Tools.CommerceML.Nodes;
 
 namespace Vodovoz.Tools.CommerceML
 {
-	public class Export
+	public class Exchange
 	{
         private static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
 
@@ -77,7 +79,7 @@ namespace Vodovoz.Tools.CommerceML
 
 #endregion
 
-		public Export(IUnitOfWork uow )
+		public Exchange(IUnitOfWork uow )
 		{
 			UOW = uow;
 		}
@@ -90,7 +92,7 @@ namespace Vodovoz.Tools.CommerceML
 			CreateObjects();
 
 			OnProgressPlusOneTask("Сохраняем import.xml");
-            using(XmlWriter writer = XmlWriter.Create(Path.Combine(dir, "import.xml"), Export.WriterSettings)) {
+            using(XmlWriter writer = XmlWriter.Create(Path.Combine(dir, "import.xml"), Exchange.WriterSettings)) {
             	rootCatalog.GetXDocument().Save(writer);
             }
 
@@ -107,7 +109,7 @@ namespace Vodovoz.Tools.CommerceML
 			}
 
 			OnProgressPlusOneTask("Сохраняем offers.xml");
-			using(XmlWriter writer = XmlWriter.Create(Path.Combine(dir, "offers.xml"), Export.WriterSettings)) {
+			using(XmlWriter writer = XmlWriter.Create(Path.Combine(dir, "offers.xml"), Exchange.WriterSettings)) {
 				rootOffers.GetXDocument().Save(writer);
 			}
 
@@ -174,6 +176,69 @@ namespace Vodovoz.Tools.CommerceML
 			SendImportCommand(client, "offers.xml");
         }
 
+		public void OrdersSyncToSite()
+		{
+			Errors.Clear();
+			TotalTasks = 12;
+
+			OnProgressPlusOneTask("Соединяемся с сайтом");
+			//Проверяем связь с сервером
+			var baseUrl = MainSupport.BaseParameters.All[OnlineStoreUrlParameterName].TrimEnd('/');
+			var client = new RestClient(baseUrl);
+			client.CookieContainer = new System.Net.CookieContainer();
+			client.Authenticator = new HttpBasicAuthenticator(MainSupport.BaseParameters.All[OnlineStoreLoginParameterName],
+															  MainSupport.BaseParameters.All[OnlineStorePasswordParameterName]);
+			var request = new RestRequest("1c_exchange.php?type=sale&mode=checkauth", Method.GET);
+			IRestResponse response = client.Execute(request);
+			DebugResponse(response);
+			if(!response.Content.StartsWith("success")) {
+				Errors.Add($"Не возможно связаться с сайтом. Ответ Сайта:{response.Content}");
+				return;
+			}
+
+			OnProgressPlusOneTask("Инициализация процесса обмена");
+			//Инициализируем передачу. Ответ о сжатии и размере нас не интересует. Мы не умеем других вариантов.
+			request = new RestRequest("1c_exchange.php?type=sale&mode=init", Method.GET);
+			response = client.Execute(request);
+			DebugResponse(response);
+
+			OnProgressPlusOneTask("Получение заказов с сайта");
+			request = new RestRequest("1c_exchange.php?type=sale&mode=query", Method.GET);
+			response = client.Execute(request);
+			DebugResponse(response);
+			OnProgressPlusOneTask("Обработка полученных заказов");
+			var reader = new OrdersReader(this);
+			reader.Read(GetDecodedConnent(response));
+
+			OnProgressPlusOneTask("Выгружаем изображения");
+			var exportedImages = Catalog.Goods.Nomenclatures.SelectMany(x => x.Images);
+
+			foreach(var img in exportedImages) {
+				var imgFileName = $"img_{img.Id:0000000}.jpg";
+				var dirImgFileName = $"import_files/" + imgFileName;
+				OnProgressTextOnly("Отправляем " + imgFileName);
+
+				//Внимание здесь "/" после 1c_exchange.php не случаен в документации его нет, но если его не написать то на запрос без слеша,
+				// приходит ответ 301 то есть переадресация на такую же строку но со слешем, но RestSharp после переадресации уже отправляет
+				// не POST запрос а GET, из за чего, файл не принимается нормально сервером.
+				request = new RestRequest("1c_exchange.php/?type=catalog&mode=file&filename=" + dirImgFileName, Method.POST);
+				request.AddParameter("image/jpeg", img.Image, ParameterType.RequestBody);
+				response = client.Execute(request);
+				DebugResponse(response);
+			}
+			Results.Add("Выгружено изображений: " + exportedImages.Count());
+
+			OnProgressPlusOneTask("Выгружаем склад");
+			SendFileXMLDoc(client, "offers.xml", rootOffers);
+
+			Results.Add("Выгрузка каталога товаров:");
+			OnProgressPlusOneTask("Импорт каталога товаров на сайте.");
+			SendImportCommand(client, "import.xml");
+			Results.Add("Выгрузка склада и цен:");
+			OnProgressPlusOneTask("Импорт склада и цен на сайте.");
+			SendImportCommand(client, "offers.xml");
+		}
+
 		private void SendImportCommand(RestClient client, string filename)
 		{
 			var request = new RestRequest("1c_exchange.php?type=catalog&mode=import&filename=" + filename, Method.GET);
@@ -221,9 +286,16 @@ namespace Vodovoz.Tools.CommerceML
 			logger.Debug(response.ResponseUri?.ToString());
 			logger.Debug("Cookies:{0}", String.Join(";", response.Cookies.Select(x => x.Name + "=" + x.Value)));
             logger.Debug(response.StatusCode.ToString());
-			logger.Debug(response.Content);
+			logger.Debug(GetDecodedConnent(response));
 		}
 
+		string GetDecodedConnent(IRestResponse response)
+		{
+			if(response.ContentType == "text/xml; charset=windows-1251")
+				return Encoding.GetEncoding(1251).GetString(response.RawBytes);
+			else
+				return response.Content;
+		}
 
 		void  CreateObjects()
 		{

@@ -20,18 +20,18 @@ namespace Vodovoz.Dialogs.OnlineStore
 			}
 
 			this.Build();
-			TabName = "Экспорт интернет магазин";
-			if(MainSupport.BaseParameters.All.ContainsKey(Export.OnlineStoreUrlParameterName))
-				entrySitePath.Text = MainSupport.BaseParameters.All[Export.OnlineStoreUrlParameterName];
-			if(MainSupport.BaseParameters.All.ContainsKey(Export.OnlineStoreLoginParameterName))
-				entryUser.Text = MainSupport.BaseParameters.All[Export.OnlineStoreLoginParameterName];
-			if(MainSupport.BaseParameters.All.ContainsKey(Export.OnlineStorePasswordParameterName))
-				entryPassword.Text = MainSupport.BaseParameters.All[Export.OnlineStorePasswordParameterName];
+			TabName = "Обмен с интернет магазином";
+			if(MainSupport.BaseParameters.All.ContainsKey(Exchange.OnlineStoreUrlParameterName))
+				entrySitePath.Text = MainSupport.BaseParameters.All[Exchange.OnlineStoreUrlParameterName];
+			if(MainSupport.BaseParameters.All.ContainsKey(Exchange.OnlineStoreLoginParameterName))
+				entryUser.Text = MainSupport.BaseParameters.All[Exchange.OnlineStoreLoginParameterName];
+			if(MainSupport.BaseParameters.All.ContainsKey(Exchange.OnlineStorePasswordParameterName))
+				entryPassword.Text = MainSupport.BaseParameters.All[Exchange.OnlineStorePasswordParameterName];
 		}
 
 		protected void OnButtonRunToFileClicked(object sender, EventArgs e)
 		{
-			using(var uow = UnitOfWorkFactory.CreateWithoutRoot())
+			using(var uow = UnitOfWorkFactory.CreateWithoutRoot("Диалог «Обмен с сайтом» - кнопка «Экспортировать в файл»"))
 			{
 				var fileChooser = new Gtk.FileChooserDialog("Выберите папку для сохранения выгрузки",
 					(Window)this.Toplevel,
@@ -49,7 +49,7 @@ namespace Vodovoz.Dialogs.OnlineStore
 				var directory = fileChooser.Filename;
 				fileChooser.Destroy();
 
-				var export = new Export(uow);
+				var export = new Exchange(uow);
 				export.ProgressUpdated += Export_ProgressUpdated;
 
 				export.RunToDirectory(directory);
@@ -65,23 +65,23 @@ namespace Vodovoz.Dialogs.OnlineStore
 
 		protected void OnEntrySitePathFocusOutEvent(object o, FocusOutEventArgs args)
 		{
-			MainSupport.BaseParameters.UpdateParameter(QSMain.ConnectionDB, Export.OnlineStoreUrlParameterName, entrySitePath.Text);
+			MainSupport.BaseParameters.UpdateParameter(QSMain.ConnectionDB, Exchange.OnlineStoreUrlParameterName, entrySitePath.Text);
 		}
 
 		protected void OnEntryUserFocusOutEvent(object o, FocusOutEventArgs args)
 		{
-			MainSupport.BaseParameters.UpdateParameter(QSMain.ConnectionDB, Export.OnlineStoreLoginParameterName, entryUser.Text);
+			MainSupport.BaseParameters.UpdateParameter(QSMain.ConnectionDB, Exchange.OnlineStoreLoginParameterName, entryUser.Text);
 		}
 
 		protected void OnEntryPasswordFocusOutEvent(object o, FocusOutEventArgs args)
 		{
-			MainSupport.BaseParameters.UpdateParameter(QSMain.ConnectionDB, Export.OnlineStorePasswordParameterName, entryPassword.Text);
+			MainSupport.BaseParameters.UpdateParameter(QSMain.ConnectionDB, Exchange.OnlineStorePasswordParameterName, entryPassword.Text);
 		}
 
 		protected void OnButtonExportToSiteClicked(object sender, EventArgs e)
 		{
-			using(var uow = UnitOfWorkFactory.CreateWithoutRoot()) {
-				var export = new Export(uow);
+			using(var uow = UnitOfWorkFactory.CreateWithoutRoot("Диалог «Обмен с сайтом» - кнопка «Экспортировать каталог на сайт»")) {
+				var export = new Exchange(uow);
 				export.ProgressUpdated += Export_ProgressUpdated;
 
 				export.RunToSite();
@@ -98,7 +98,7 @@ namespace Vodovoz.Dialogs.OnlineStore
 
 		void Export_ProgressUpdated(object sender, EventArgs e)
 		{
-			var export = sender as Export;
+			var export = sender as Exchange;
 			progressbarTotal.Text = export.CurrentTaskText + export.CurrentStepText;
 			progressbarTotal.Adjustment.Upper = export.TotalTasks;
 			progressbarTotal.Adjustment.Value = export.CurrentTask;
@@ -138,5 +138,22 @@ namespace Vodovoz.Dialogs.OnlineStore
             tempBuffer.InsertWithTags(ref iter, String.Join("\n", results), tagResult);
             textviewErrors.Buffer = tempBuffer;
         }
-    }
+
+		protected void OnButtonSyncOrdersClicked(object sender, EventArgs e)
+		{
+			using(var uow = UnitOfWorkFactory.CreateWithoutRoot("Диалог «Обмен с сайтом» - кнопка «Синхронизация заказов»")) {
+				var export = new Exchange(uow);
+				export.ProgressUpdated += Export_ProgressUpdated;
+
+				export.OrdersSyncToSite();
+
+				if(UpdateErrors(export.Errors))
+					return;
+
+				UpdateResults(export.Results);
+				progressbarTotal.Text = "Готово";
+				progressbarTotal.Adjustment.Value = progressbarTotal.Adjustment.Upper;
+			}
+		}
+	}
 }

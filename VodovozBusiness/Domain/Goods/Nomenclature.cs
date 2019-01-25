@@ -5,7 +5,6 @@ using System.Linq;
 using Gamma.Utilities;
 using QSBusinessCommon.Domain;
 using QS.DomainModel.Entity;
-using QSOrmProject;
 using QSProjectsLib;
 using Vodovoz.Domain.Employees;
 using Vodovoz.Domain.Store;
