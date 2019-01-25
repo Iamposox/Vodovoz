@@ -10,7 +10,7 @@ namespace Vodovoz.Tools.CommerceML.Nodes
 	{
 		IList<ProductGroup> treeOfGroups;
 
-		public Groups(Export export)
+		public Groups(Exchange export)
 		{
 			myExport = export;
 			myExport.OnProgressPlusOneTask("Выгружаем группы товаров");
@@ -22,7 +22,7 @@ namespace Vodovoz.Tools.CommerceML.Nodes
 			treeOfGroups = all.Where(x => x.Parent == null).ToList();
 		}
 
-		Export myExport;
+		Exchange myExport;
 
 		public Guid Guid => throw new NotImplementedException();
 

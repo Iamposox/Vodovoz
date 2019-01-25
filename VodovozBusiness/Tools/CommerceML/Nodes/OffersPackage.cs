@@ -8,7 +8,7 @@ namespace Vodovoz.Tools.CommerceML.Nodes
 	public class OffersPackage: IGuidNode, IXmlConvertable 
 	{
 
-		public OffersPackage(Export export, Classifier classifier, Catalog catalog)
+		public OffersPackage(Exchange export, Classifier classifier, Catalog catalog)
 		{
 			myExport = export;
 			Catalog = catalog;
@@ -16,7 +16,7 @@ namespace Vodovoz.Tools.CommerceML.Nodes
 			offers = new Offers(export);
 		}
 
-		Export myExport;
+		Exchange myExport;
 		Offers offers;
 
 		public Guid Guid => Guid.Parse("32848d9e-18c5-4995-95cb-dca685577de1");

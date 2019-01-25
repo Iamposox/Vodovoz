@@ -12,7 +12,7 @@ namespace Vodovoz.Tools.CommerceML.Nodes
 	{
 		Dictionary<int, decimal> amounts;
 
-		public Offers(Export export)
+		public Offers(Exchange export)
 		{
 			myExport = export;
 			myExport.OnProgressPlusOneTask("Выгружаем наличие на складе");
@@ -24,7 +24,7 @@ namespace Vodovoz.Tools.CommerceML.Nodes
 			amounts = StockRepository.NomenclatureInStock(myExport.UOW, warehousesIds, nomenclatureIds);
 		}
 
-		Export myExport;
+		Exchange myExport;
 
 		public XElement ToXml()
 		{

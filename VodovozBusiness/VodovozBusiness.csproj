@@ -151,6 +151,7 @@
     <Reference Include="RestSharp">
       <HintPath>..\packages\RestSharp.106.6.5\lib\net452\RestSharp.dll</HintPath>
     </Reference>
+    <Reference Include="nunit.framework" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -489,7 +490,7 @@
     <Compile Include="Repositories\UndeliveredOrderCommentsRepository.cs" />
     <Compile Include="Domain\Client\ClientCameFrom.cs" />
     <Compile Include="HibernateMapping\Counterparty\ClientCameFromMap.cs" />
-    <Compile Include="Tools\CommerceML\Export.cs" />
+    <Compile Include="Tools\CommerceML\Exchange.cs" />
     <Compile Include="Tools\IXmlConvertable.cs" />
     <Compile Include="Tools\CommerceML\Nodes\Root.cs" />
     <Compile Include="Tools\CommerceML\Nodes\Classifier.cs" />
@@ -546,6 +547,16 @@
     <Compile Include="HibernateMapping\Employees\CitizenshipMap.cs" />
     <Compile Include="HibernateMapping\Employees\EmployeeContractMap.cs" />
     <Compile Include="DocTemplates\EmployeeContractParser.cs" />
+    <Compile Include="Repositories\Store\CarUnloadRepository.cs" />
+    <Compile Include="Domain\Logistic\LoadingUnloadingOperation.cs" />
+    <Compile Include="HibernateMapping\Logistic\LoadingUnloadingOperationMap.cs" />
+    <Compile Include="Repositories\Store\CarLoadRepository.cs" />
+    <Compile Include="Tools\CommerceML\OrdersReader.cs" />
+    <Compile Include="Domain\OnlineStore\OnlineClient.cs" />
+    <Compile Include="Domain\OnlineStore\OnlineOrder.cs" />
+    <Compile Include="Domain\OnlineStore\OnlineOrderItem.cs" />
+    <Compile Include="Repositories\OnlineStore\OnlineClientRepository.cs" />
+    <Compile Include="Repositories\OnlineStore\OnlineOrderRepository.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -574,6 +585,8 @@
     <Folder Include="HibernateMapping\Payments\" />
     <Folder Include="Repositories\Payments\" />
     <Folder Include="Repositories\HumanResourses\" />
+    <Folder Include="Domain\OnlineStore\" />
+    <Folder Include="Repositories\OnlineStore\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\QSProjects\Modules\QSBanks\QSBanks.csproj">

@@ -10,7 +10,7 @@ namespace Vodovoz.Tools.CommerceML.Nodes
 	public class Classifier: GuidNodeBase, IXmlConvertable 
 	{
 
-		public Classifier(Export export)
+		public Classifier(Exchange export)
 		{
 			myExport = export;
 			myExport.ProductGroups = groups = new Groups(export);
@@ -21,7 +21,7 @@ namespace Vodovoz.Tools.CommerceML.Nodes
 			}
 		}
 
-		Export myExport;
+		Exchange myExport;
 		Groups groups;
 
 		public override Guid Guid => Guid.Parse("a1a11de6-03b3-4d98-b98d-4d4c0601aa9e");
