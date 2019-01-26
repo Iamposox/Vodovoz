@@ -105,6 +105,17 @@ namespace Vodovoz.Tools.CommerceML
 				notProcessedItems.ForEach(x => order.Items.Remove(x));
 				#endregion
 				#region Значения реквизитов
+				var requisites = node.SelectSingleNode("ЗначенияРеквизитов");
+				DateTime paymentDate;
+				if(DateTime.TryParse(requisites.SelectSingleNode("ЗначениеРеквизита[Наименование='Дата оплаты']/Значение").InnerText, out paymentDate))
+					order.PaymentDate = paymentDate;
+				order.PaymentDocument = requisites.SelectSingleNode("ЗначениеРеквизита[Наименование='Номер платежного документа']/Значение").InnerText;
+				order.PaymentMethod = requisites.SelectSingleNode("ЗначениеРеквизита[Наименование='Метод оплаты']/Значение").InnerText;
+				order.OrderPaid = XmlConvert.ToBoolean(requisites.SelectSingleNode("ЗначениеРеквизита[Наименование='Заказ оплачен']/Значение").InnerText);
+				order.Canceled = XmlConvert.ToBoolean(requisites.SelectSingleNode("ЗначениеРеквизита[Наименование='Отменен']/Значение").InnerText);
+				order.Finish = XmlConvert.ToBoolean(requisites.SelectSingleNode("ЗначениеРеквизита[Наименование='Финальный статус']/Значение").InnerText);
+				order.Status = requisites.SelectSingleNode("ЗначениеРеквизита[Наименование='Статус заказа']/Значение").InnerText;
+				order.DateOfStatusChange = DateTime.Parse(requisites.SelectSingleNode("ЗначениеРеквизита[Наименование='Дата изменения статуса']/Значение").InnerText);
 				#endregion
 				Orders.Add(order);
 			}

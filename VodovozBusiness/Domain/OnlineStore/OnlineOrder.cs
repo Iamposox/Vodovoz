@@ -111,10 +111,10 @@ namespace Vodovoz.Domain.OnlineStore
 			set { SetField(ref items, value); }
 		}
 
-		private DateTime paymentDate;
+		private DateTime? paymentDate;
 
 		[Display(Name = "Дата оплаты")]
-		public virtual DateTime PaymentDate {
+		public virtual DateTime? PaymentDate {
 			get { return paymentDate; }
 			set { SetField(ref paymentDate, value); }
 		}

@@ -49,6 +49,15 @@ namespace VodovozBusinessTests.Tools.CommerceML
 			Assert.That(order.Comments, Is.EqualTo("Заказ №7"));
 			Assert.That(order.Sum, Is.EqualTo(650));
 
+			Assert.That(order.PaymentDate, Is.EqualTo(new DateTime(2018, 12, 13)));
+			Assert.That(order.PaymentDocument, Is.EqualTo("33561"));
+			Assert.That(order.PaymentMethod, Is.EqualTo("Счет для юр. лиц"));
+			Assert.That(order.OrderPaid, Is.EqualTo(false));
+			Assert.That(order.Canceled, Is.EqualTo(false));
+			Assert.That(order.Finish, Is.EqualTo(false));
+			Assert.That(order.Status, Is.EqualTo("Доставляется"));
+			Assert.That(order.DateOfStatusChange, Is.EqualTo(new DateTime(2018, 12, 13, 11, 25, 0)));
+
 			var client = order.OnlineClient;
 			Assert.That(client.OnlineStoreId, Is.EqualTo("2202"));
 			Assert.That(client.Name, Is.EqualTo("Иван\u00a0Проверочкин"));//Тут мы получаем в качестве пробела символ неразрывного пробела так передет umi
