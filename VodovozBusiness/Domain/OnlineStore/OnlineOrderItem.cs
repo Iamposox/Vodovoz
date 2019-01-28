@@ -16,12 +16,12 @@ namespace Vodovoz.Domain.OnlineStore
 		#region Свойства
 		public virtual int Id { get; set; }
 
-		private string onlineStoreId;
+		private OnlineOrder onlineOrder;
 
-		[Display(Name = "ID в интернет магазине")]
-		public virtual string OnlineStoreId {
-			get { return onlineStoreId; }
-			set { SetField(ref onlineStoreId, value); }
+		[Display(Name = "Заказ")]
+		public virtual OnlineOrder OnlineOrder {
+			get { return onlineOrder; }
+			set { SetField(ref onlineOrder, value); }
 		}
 
 		private OrderItem orderItem;
@@ -30,6 +30,14 @@ namespace Vodovoz.Domain.OnlineStore
 		public virtual OrderItem OrderItem {
 			get { return orderItem; }
 			set { SetField(ref orderItem, value); }
+		}
+
+		private string onlineStoreId;
+
+		[Display(Name = "ID в интернет магазине")]
+		public virtual string OnlineStoreId {
+			get { return onlineStoreId; }
+			set { SetField(ref onlineStoreId, value); }
 		}
 
 		private Nomenclature nomenclature;

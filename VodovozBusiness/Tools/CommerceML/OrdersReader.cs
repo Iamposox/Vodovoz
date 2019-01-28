@@ -94,7 +94,7 @@ namespace Vodovoz.Tools.CommerceML
 					var item = order.Items.FirstOrDefault(x => x.Nomenclature.Id == nomenclature.Id);
 					if(item == null) {
 						item = new OnlineOrderItem(nomenclature);
-						order.Items.Add(item);
+						order.AddItem(item);
 					} else
 						notProcessedItems.Remove(item);
 					item.Price = decimal.Parse(itemNode.SelectSingleNode("ЦенаЗаЕдиницу").InnerXml);
