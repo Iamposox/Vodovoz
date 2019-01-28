@@ -794,13 +794,6 @@ namespace Vodovoz
 
 			#endregion
 
-			//Для тетирования
-			#if DEBUG
-			DeleteConfig.IgnoreMissingClass.Add (typeof(TrackPoint));
-
-			DeleteConfig.DeletionCheck ();
-			#endif
-
 			logger.Info ("Ок");
 		}
 	}
