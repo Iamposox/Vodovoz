@@ -199,5 +199,16 @@ namespace Vodovoz.Tools.CommerceML
 			//	}
 			//}
 		}
+
+		public void Save()
+		{
+			foreach(var client in OnlineClients)
+				UoW.Save(client);
+
+			foreach(var order in Orders)
+				UoW.Save(order);
+
+			UoW.Commit();
+		}
 	}
 }

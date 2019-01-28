@@ -1,4 +1,5 @@
 ﻿using FluentNHibernate.Mapping;
+using NHibernate.Type;
 using Vodovoz.Domain.OnlineStore;
 
 namespace Vodovoz.HibernateMapping.OnlineStore
@@ -14,7 +15,7 @@ namespace Vodovoz.HibernateMapping.OnlineStore
 			Map(x => x.OnlineStoreId).Column("onlinestore_code");
 			Map(x => x.Number).Column("number");
 			Map(x => x.Date).Column("date");
-			Map(x => x.Time).Column("time");
+			Map(x => x.Time).Column("time").CustomType<TimeAsTimeSpanType>();
 			Map(x => x.OperationType).Column("operation_type");
 			Map(x => x.Role).Column("role");
 			Map(x => x.Currency).Column("currency");

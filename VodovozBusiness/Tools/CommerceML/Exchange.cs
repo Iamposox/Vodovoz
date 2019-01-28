@@ -206,37 +206,20 @@ namespace Vodovoz.Tools.CommerceML
 			request = new RestRequest("1c_exchange.php?type=sale&mode=query", Method.GET);
 			response = client.Execute(request);
 			DebugResponse(response);
+
 			OnProgressPlusOneTask("Обработка полученных заказов");
 			var reader = new OrdersReader(this);
 			reader.Read(GetDecodedConnent(response));
 
-			OnProgressPlusOneTask("Выгружаем изображения");
-			var exportedImages = Catalog.Goods.Nomenclatures.SelectMany(x => x.Images);
+			OnProgressPlusOneTask("Сохранение полученных заказов");
+			reader.Save();
+			Results.Add($"Загружено клиентов: {reader.OnlineClients.Count}");
+			Results.Add($"Загружено заказов: {reader.Orders.Count}");
 
-			foreach(var img in exportedImages) {
-				var imgFileName = $"img_{img.Id:0000000}.jpg";
-				var dirImgFileName = $"import_files/" + imgFileName;
-				OnProgressTextOnly("Отправляем " + imgFileName);
-
-				//Внимание здесь "/" после 1c_exchange.php не случаен в документации его нет, но если его не написать то на запрос без слеша,
-				// приходит ответ 301 то есть переадресация на такую же строку но со слешем, но RestSharp после переадресации уже отправляет
-				// не POST запрос а GET, из за чего, файл не принимается нормально сервером.
-				request = new RestRequest("1c_exchange.php/?type=catalog&mode=file&filename=" + dirImgFileName, Method.POST);
-				request.AddParameter("image/jpeg", img.Image, ParameterType.RequestBody);
-				response = client.Execute(request);
-				DebugResponse(response);
-			}
-			Results.Add("Выгружено изображений: " + exportedImages.Count());
-
-			OnProgressPlusOneTask("Выгружаем склад");
-			SendFileXMLDoc(client, "offers.xml", rootOffers);
-
-			Results.Add("Выгрузка каталога товаров:");
-			OnProgressPlusOneTask("Импорт каталога товаров на сайте.");
-			SendImportCommand(client, "import.xml");
-			Results.Add("Выгрузка склада и цен:");
-			OnProgressPlusOneTask("Импорт склада и цен на сайте.");
-			SendImportCommand(client, "offers.xml");
+			OnProgressPlusOneTask("Отправляем ответ о загрузке заказов");
+			request = new RestRequest("1c_exchange.php?type=sale&mode=success", Method.GET);
+			response = client.Execute(request);
+			DebugResponse(response);
 		}
 
 		private void SendImportCommand(RestClient client, string filename)
