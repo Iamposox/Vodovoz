@@ -557,6 +557,9 @@
     <Compile Include="Domain\OnlineStore\OnlineOrderItem.cs" />
     <Compile Include="Repositories\OnlineStore\OnlineClientRepository.cs" />
     <Compile Include="Repositories\OnlineStore\OnlineOrderRepository.cs" />
+    <Compile Include="HibernateMapping\OnlineStore\OnlineClientMap.cs" />
+    <Compile Include="HibernateMapping\OnlineStore\OnlineOrderMap.cs" />
+    <Compile Include="HibernateMapping\OnlineStore\OnlineOrderItemMap.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -587,6 +590,7 @@
     <Folder Include="Repositories\HumanResourses\" />
     <Folder Include="Domain\OnlineStore\" />
     <Folder Include="Repositories\OnlineStore\" />
+    <Folder Include="HibernateMapping\OnlineStore\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\QSProjects\Modules\QSBanks\QSBanks.csproj">

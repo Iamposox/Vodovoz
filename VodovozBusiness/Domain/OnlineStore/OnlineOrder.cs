@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using NHibernate.Criterion;
 using QS.DomainModel.Entity;
+using Vodovoz.Domain.Orders;
 
 namespace Vodovoz.Domain.OnlineStore
 {
@@ -180,5 +180,15 @@ namespace Vodovoz.Domain.OnlineStore
 		public OnlineOrder()
 		{
 		}
+
+		#region Методы
+
+		public virtual void AddItem(OnlineOrderItem item)
+		{
+			item.OnlineOrder = this;
+			Items.Add(item);
+		}
+
+		#endregion
 	}
 }
