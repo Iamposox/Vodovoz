@@ -547,10 +547,6 @@
     <Compile Include="HibernateMapping\Employees\CitizenshipMap.cs" />
     <Compile Include="HibernateMapping\Employees\EmployeeContractMap.cs" />
     <Compile Include="DocTemplates\EmployeeContractParser.cs" />
-    <Compile Include="Repositories\Store\CarUnloadRepository.cs" />
-    <Compile Include="Domain\Logistic\LoadingUnloadingOperation.cs" />
-    <Compile Include="HibernateMapping\Logistic\LoadingUnloadingOperationMap.cs" />
-    <Compile Include="Repositories\Store\CarLoadRepository.cs" />
     <Compile Include="Tools\CommerceML\OrdersReader.cs" />
     <Compile Include="Domain\OnlineStore\OnlineClient.cs" />
     <Compile Include="Domain\OnlineStore\OnlineOrder.cs" />
