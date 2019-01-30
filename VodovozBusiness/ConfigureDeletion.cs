@@ -13,6 +13,7 @@ using Vodovoz.Domain.Documents;
 using Vodovoz.Domain.Employees;
 using Vodovoz.Domain.Goods;
 using Vodovoz.Domain.Logistic;
+using Vodovoz.Domain.OnlineStore;
 using Vodovoz.Domain.Operations;
 using Vodovoz.Domain.Orders;
 using Vodovoz.Domain.Orders.Documents;
@@ -62,6 +63,7 @@ namespace Vodovoz
 			    .AddDeleteDependence<WarehouseMovementOperation>(item => item.Nomenclature)
 				.AddDeleteDependence<CounterpartyMovementOperation>(item => item.Nomenclature)
 				.AddDeleteDependence<NomenclatureImage>(x => x.Nomenclature)
+				.AddDeleteDependence<OnlineOrderItem>(x => x.Nomenclature)
 				.AddClearDependence<PaidRentPackage>(x => x.RentServiceDaily)
 				.AddClearDependence<PaidRentPackage>(x => x.RentServiceMonthly)
 				.AddClearDependence<PaidRentPackage>(x => x.DepositService)
@@ -115,15 +117,9 @@ namespace Vodovoz
 			}.FillFromMetaInfo ()
 			);
 
-			DeleteConfig.AddDeleteInfo (new DeleteInfo {
-				ObjectClass = typeof(MeasurementUnits),
-				SqlSelect = "SELECT id, name FROM @tablename ",
-				DisplayString = "{1}",
-				ClearItems = new List<ClearDependenceInfo> {
-					ClearDependenceInfo.Create<Nomenclature> (item => item.Unit)
-				}
-			}.FillFromMetaInfo ()
-			);
+			DeleteConfig.AddHibernateDeleteInfo<MeasurementUnits>()
+				.AddDeleteDependence<OnlineOrderItem>(x => x.Units)
+				.AddClearDependence<Nomenclature>(item => item.Unit);
 
 			DeleteConfig.AddDeleteInfo (new DeleteInfo {
 				ObjectClass = typeof(NomenclaturePrice),
@@ -322,7 +318,8 @@ namespace Vodovoz
 				.AddDeleteDependence<Residue>(x => x.Customer)
 				.AddClearDependence<Counterparty> (item => item.MainCounterparty)
 				.AddClearDependence<Counterparty>(x => x.PreviousCounterparty)
-				.AddClearDependence<Equipment>(x => x.AssignedToClient);
+				.AddClearDependence<Equipment>(x => x.AssignedToClient)
+				.AddClearDependence<OnlineClient>(x => x.Counterparty);
 
 
 			DeleteConfig.AddHibernateDeleteInfo<Contact>()
@@ -496,6 +493,7 @@ namespace Vodovoz
 				.AddDeleteDependence<OrderDocument>(x => x.AttachedToOrder)
 				.AddDeleteCascadeDependence(x => x.BottlesMovementOperation)
 				.AddDeleteCascadeDependence(x => x.MoneyMovementOperation)
+				.AddClearDependence<OnlineOrder>(x => x.Order)
 				.AddClearDependence<Order>(x => x.PreviousOrder)
 				.AddClearDependence<ServiceClaim>(x => x.InitialOrder)
 				.AddClearDependence<ServiceClaim>(x => x.FinalOrder);
@@ -503,6 +501,7 @@ namespace Vodovoz
 			DeleteConfig.AddHibernateDeleteInfo<OrderItem>()
 				.AddDeleteDependence<OrderEquipment> (item => item.OrderItem)
 				.AddDeleteDependence<SelfDeliveryDocumentItem>(x => x.OrderItem)
+				.AddDeleteDependence<OnlineOrderItem>(x => x.OrderItem)
 				.AddDeleteCascadeDependence(x => x.CounterpartyMovementOperation);
 
 			DeleteConfig.AddDeleteInfo (new DeleteInfo {
@@ -560,6 +559,18 @@ namespace Vodovoz
 			DeleteConfig.AddHibernateDeleteInfo<ShetFacturaDocument>();
 
 			DeleteConfig.AddHibernateDeleteInfo<Torg12Document>();
+
+			#endregion
+
+			#region Онлайн магазин
+
+			DeleteConfig.AddHibernateDeleteInfo<OnlineOrder>()
+				.AddDeleteDependence<OnlineOrderItem>(x => x.OnlineOrder);
+
+			DeleteConfig.AddHibernateDeleteInfo<OnlineClient>()
+				.AddDeleteDependence<OnlineOrder>(x => x.OnlineClient);
+
+			DeleteConfig.AddHibernateDeleteInfo<OnlineOrderItem>();
 
 			#endregion
 
