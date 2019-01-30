@@ -4,6 +4,7 @@ using Gtk;
 using NLog;
 using QS.Dialog.Gtk;
 using QS.Project.Dialogs;
+using QS.Project.Dialogs.GtkUI;
 using QS.Tdi.Gtk;
 using QSBanks;
 using QSBusinessCommon.Domain;
@@ -299,8 +300,8 @@ public partial class MainWindow : Gtk.Window, IProgressBarDisplayable
 	protected void OnActionEmploeyActivated(object sender, EventArgs e)
 	{
 		tdiMain.OpenTab(
-			ReferenceRepresentation.GenerateHashName<EmployeesVM>(),
-			() => new ReferenceRepresentation(new EmployeesVM())
+			RepresentationJournalDialog.GenerateHashName<EmployeesVM>(),
+			() => new RepresentationJournalDialog(new EmployeesVM())
 		);
 	}
 
