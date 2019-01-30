@@ -3,6 +3,8 @@ using Gtk;
 using QS.Dialog.Gtk;
 using QS.DomainModel.UoW;
 using QS.Project.Dialogs;
+using QS.Project.Dialogs.GtkUI;
+using QS.RepresentationModel.GtkUI;
 using QSOrmProject;
 using QSProjectsLib;
 using Vodovoz;
@@ -18,8 +20,9 @@ using Vodovoz.ViewModel;
 public partial class MainWindow : Window
 {
 	//Заказы
-	Action ActionOrdersTable;
 	Action ActionAddOrder;
+	Action ActionOrdersTable;
+	Action ActionOnlineOrders;
 	Action ActionLoadOrders;
 	Action ActionDeliveryPrice;
 	Action ActionUndeliveredOrders;
@@ -68,8 +71,9 @@ public partial class MainWindow : Window
 	{
 		#region Creating actions
 		//Заказы
-		ActionOrdersTable = new Action("ActionOrdersTable", "Журнал заказов", null, "table");
 		ActionAddOrder = new Action("ActionAddOrder", "Новый заказ", null, "table");
+		ActionOrdersTable = new Action("ActionOrdersTable", "Журнал заказов", null, "table");
+		ActionOnlineOrders = new Action("ActionOnlineOrders", "Онлайн заказы", null, "table");
 		ActionLoadOrders = new Action("ActionLoadOrders", "Загрузить из 1С", null, "table");
 		ActionDeliveryPrice = new Action("ActionDeliveryPrice", "Стоимость доставки", null, null);
 		ActionUndeliveredOrders = new Action("ActionUndeliveredOrders", "Журнал недовозов", null, null);
@@ -121,8 +125,9 @@ public partial class MainWindow : Window
 		#region Inserting actions to the toolbar
 		ActionGroup w1 = new ActionGroup("ToolbarActions");
 		//Заказы
-		w1.Add(ActionOrdersTable, null);
 		w1.Add(ActionAddOrder, null);
+		w1.Add(ActionOrdersTable, null);
+		w1.Add(ActionOnlineOrders, null);
 		w1.Add(ActionLoadOrders, null);
 		w1.Add(ActionDeliveryPrice, null);
 		w1.Add(ActionUndeliveredOrders, null);
@@ -170,8 +175,9 @@ public partial class MainWindow : Window
 		#endregion
 		#region Creating events
 		//Заказы
-		ActionOrdersTable.Activated += ActionOrdersTableActivated;
 		ActionAddOrder.Activated += ActionAddOrder_Activated;
+		ActionOrdersTable.Activated += ActionOrdersTableActivated;
+		ActionOnlineOrders.Activated += ActionOnlineOrders_Activated;;
 		ActionLoadOrders.Activated += ActionLoadOrders_Activated;
 		ActionDeliveryPrice.Activated += ActionDeliveryPrice_Activated;
 		ActionUndeliveredOrders.Activated += ActionUndeliveredOrdersActivated;
@@ -537,6 +543,11 @@ public partial class MainWindow : Window
 			() => new ReferenceRepresentation(new OrdersVM()).CustomTabName("Журнал заказов")
 			.Buttons(QSMain.User.Permissions["can_delete"] ? ReferenceButtonMode.CanAll : (ReferenceButtonMode.CanAdd | ReferenceButtonMode.CanEdit))
 		);
+	}
+
+	void ActionOnlineOrders_Activated(object sender, System.EventArgs e)
+	{
+		tdiMain.OpenTab<RepresentationJournalDialog, IRepresentationModel>(new OnlineOrdersVM());
 	}
 
 	void ActionUndeliveredOrdersActivated(object sender, System.EventArgs e)
