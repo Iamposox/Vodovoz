@@ -27,6 +27,7 @@ using Vodovoz.Domain.Sale;
 using Vodovoz.Domain.Store;
 using Vodovoz.JournalViewers;
 using Vodovoz.ReportsParameters;
+using Vodovoz.ReportsParameters.Bottles;
 using Vodovoz.ReportsParameters.Logistic;
 using Vodovoz.ReportsParameters.Payments;
 using Vodovoz.ReportsParameters.Store;
@@ -87,7 +88,7 @@ public partial class MainWindow : Gtk.Window, IProgressBarDisplayable
 		ActionReports.Sensitive = false;
 		ActionServices.Visible = false;
 		ActionMaintenance.Sensitive = QSMain.User.Permissions["database_maintenance"];
-
+		ActionDocTemplates.Visible = QSMain.User.Admin;
 		unreadedMessagesWidget.MainTab = tdiMain;
 		//Читаем настройки пользователя
 		switch(CurrentUserSettings.Settings.ToolbarStyle) {
@@ -1092,5 +1093,13 @@ public partial class MainWindow : Gtk.Window, IProgressBarDisplayable
 			QSReport.ReportViewDlg.GenerateHashName<OrdersByDistrictsAndDeliverySchedulesReport>(),
 			() => new QSReport.ReportViewDlg(new OrdersByDistrictsAndDeliverySchedulesReport())
 		);
+	}
+
+	protected void OnActionOrdersByCreationDate(object sender, EventArgs e)
+	{
+		tdiMain.OpenTab(
+			QSReport.ReportViewDlg.GenerateHashName<OrdersByCreationDateReport>(),
+			() => new QSReport.ReportViewDlg(new OrdersByCreationDateReport())
+			);
 	}
 }

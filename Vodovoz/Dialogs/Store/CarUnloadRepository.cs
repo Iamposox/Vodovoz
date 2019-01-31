@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using NHibernate.Criterion;
 using QS.DomainModel.UoW;
+using QSProjectsLib;
 using Vodovoz.Domain.Documents;
 using Vodovoz.Domain.Logistic;
 using Vodovoz.Domain.Operations;
@@ -29,6 +31,24 @@ namespace Vodovoz.Repositories.Store
 							.SelectSum(() => movementOperationAlias.Amount)
 						   ).List<object[]>();
 			return unloadedlist.ToDictionary(r => (int)r[0], r => (decimal)r[1]);
+		}
+
+		public static bool IsUniqDocument(IUnitOfWork UoW, RouteList routeList, Warehouse warehouse,int id)
+		{
+			if(id != 0)
+				return true;
+
+			CarUnloadDocument carUnloadDocument = null;
+			var getSimilarCarUnloadDoc = QueryOver.Of<CarUnloadDocument>(() => carUnloadDocument)
+									.Where(() => carUnloadDocument.RouteList.Id == routeList.Id)
+									.Where(() => carUnloadDocument.Warehouse.Id == warehouse.Id);
+			IList<CarUnloadDocument> documents = getSimilarCarUnloadDoc.GetExecutableQueryOver(UoW.Session)
+				.List();
+
+			if(documents.Count > 0)
+				return false;
+			else
+				return true;
 		}
 	}
 }
