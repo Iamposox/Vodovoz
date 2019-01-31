@@ -1497,27 +1497,30 @@ namespace Vodovoz.Domain.Orders
 			UpdateDocuments();
 		}
 
-		public virtual void AddAnyGoodsNomenclatureForSale(Nomenclature nomenclature, bool isChangeOrder = false, int? cnt = null)
+		public virtual OrderItem AddAnyGoodsNomenclatureForSale(Nomenclature nomenclature, int? cnt = null)
 		{
 			var acceptCategories = Nomenclature.GetCategoriesForSale();
 			if(!acceptCategories.Contains(nomenclature.Category)) {
-				return;
+				return null;
 			}
 
 			var count = (nomenclature.Category == NomenclatureCategory.service
-						 || nomenclature.Category == NomenclatureCategory.deposit) && !isChangeOrder ? 1 : 0;
+						 || nomenclature.Category == NomenclatureCategory.deposit) ? 1 : 0;
 
 			if(cnt.HasValue)
 				count = cnt.Value;
 
-			ObservableOrderItems.Add(new OrderItem {
+			var item = new OrderItem {
 				Order = this,
 				AdditionalAgreement = null,
 				Count = count,
 				Equipment = null,
 				Nomenclature = nomenclature,
 				Price = nomenclature.GetPrice(1)
-			});
+			};
+
+			ObservableOrderItems.Add(item);
+			return item;
 		}
 
 		/// <summary>
@@ -1544,7 +1547,7 @@ namespace Vodovoz.Domain.Orders
 
 			Nomenclature followingNomenclature = NomenclatureRepository.GetNomenclatureToAddWithMaster(UoW);
 			if(quantityOfFollowingNomenclatures > 0 && !ObservableOrderItems.Any(i => i.Nomenclature.Id == followingNomenclature.Id))
-				AddAnyGoodsNomenclatureForSale(followingNomenclature, false, 1);
+				AddAnyGoodsNomenclatureForSale(followingNomenclature, 1);
 		}
 
 		public virtual void AddWaterForSale(Nomenclature nomenclature, WaterSalesAgreement wsa, int count)

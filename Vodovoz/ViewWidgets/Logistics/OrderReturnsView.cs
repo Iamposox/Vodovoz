@@ -183,7 +183,7 @@ namespace Vodovoz
 					routeListItem.Order.AddMasterNomenclature(nomenclature, 0);
 					break;
 				default:
-					routeListItem.Order.AddAnyGoodsNomenclatureForSale(nomenclature, true);
+					routeListItem.Order.AddAnyGoodsNomenclatureForSale(nomenclature, 0);
 					break;
 			}
 			UpdateItemsList();
