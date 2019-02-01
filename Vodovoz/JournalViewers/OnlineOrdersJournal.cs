@@ -56,6 +56,11 @@ namespace Vodovoz.JournalViewers
 				selectCounterparty.Tag = dialog.SelectedNodes.First();
 				selectCounterparty.Mode = QS.Project.Dialogs.JournalSelectMode.Sinlge;
 				selectCounterparty.ObjectSelected += SelectCounterparty_ObjectSelected;
+
+				var node = dialog.SelectedNodes.First() as OnlineOrdersVMNode;
+				if(!String.IsNullOrWhiteSpace(node.ClientFirstName) || !String.IsNullOrWhiteSpace(node.ClientLastName)) {
+					selectCounterparty.SetSearchTexts(node.ClientFirstName, node.ClientLastName);
+				}
 				dialog.TabParent.AddSlaveTab(dialog, selectCounterparty);
 			}
 

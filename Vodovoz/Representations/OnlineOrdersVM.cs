@@ -59,6 +59,8 @@ namespace Vodovoz.Representations
 				   .Select(() => onlineOrderAlias.DateOfStatusChange).WithAlias(() => resultAlias.LastEditedTime)
 				   .Select(() => counterpartyAlias.Name).WithAlias(() => resultAlias.Counterparty)
 				   .Select(() => onlineClientAlias.Name).WithAlias(() => resultAlias.CounterpartyOnline)
+				   .Select(() => onlineClientAlias.FirstName).WithAlias(() => resultAlias.ClientFirstName)
+				   .Select(() => onlineClientAlias.LastName).WithAlias(() => resultAlias.ClientLastName)
 				   .Select(() => onlineOrderAlias.Sum).WithAlias(() => resultAlias.Sum)
 				   .Select(() => onlineOrderAlias.Comments).WithAlias(() => resultAlias.Comment)
 				   .Select(() => orderAlias.Id).WithAlias(() => resultAlias.OrderId)
@@ -117,6 +119,9 @@ namespace Vodovoz.Representations
 		public string Client => String.IsNullOrWhiteSpace(Counterparty) ? CounterpartyOnline : Counterparty;
 
 		public decimal Sum { get; set; }
+
+		public string ClientFirstName { get; set; }
+		public string ClientLastName { get; set; }
 
 		[UseForSearch]
 		[SearchHighlight]
