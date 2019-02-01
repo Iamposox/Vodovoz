@@ -25,10 +25,10 @@ namespace Vodovoz.Representations
 			.AddColumn("Дата").AddTextRenderer(node => node.CreateDate)
 			.AddColumn("Обработка").AddTextRenderer(node => node.NeedAction)
 			.AddColumn("Статус").AddTextRenderer(node => node.OnlineStatus)
-			.AddColumn("Клиент").SetDataProperty(node => node.Client)
+			.AddColumn("Клиент").AddTextRenderer(node => node.Client)
 			.AddColumn("Сумма").AddTextRenderer(node => CurrencyWorks.GetShortCurrencyString(node.Sum))
 			.AddColumn("Послед. изменения").AddTextRenderer(node => node.LastEditedTime != default(DateTime) ? node.LastEditedTime.ToString() : String.Empty)
-			.AddColumn("Комментарий").SetDataProperty(node => node.Comment)
+			.AddColumn("Комментарий").AddTextRenderer(node => node.Comment)
 			.RowCells().AddSetter<CellRendererText>((c, n) => c.Foreground = n.RowColor)
 			.Finish();
 
@@ -50,7 +50,7 @@ namespace Vodovoz.Representations
 				.JoinAlias(o => o.OnlineClient, () => onlineClientAlias)
 				.JoinAlias(() => onlineClientAlias.Counterparty, () => counterpartyAlias, NHibernate.SqlCommand.JoinType.LeftOuterJoin)
 				.SelectList(list => list
-				   .Select(() => onlineClientAlias.Id).WithAlias(() => resultAlias.Id)
+				   .Select(() => onlineOrderAlias.Id).WithAlias(() => resultAlias.Id)
 				   .Select(() => onlineOrderAlias.Number).WithAlias(() => resultAlias.Number)
 				   .Select(() => onlineOrderAlias.Date).WithAlias(() => resultAlias.Date)
 				   .Select(() => onlineOrderAlias.Time).WithAlias(() => resultAlias.Time)
@@ -61,6 +61,9 @@ namespace Vodovoz.Representations
 				   .Select(() => onlineClientAlias.Name).WithAlias(() => resultAlias.CounterpartyOnline)
 				   .Select(() => onlineOrderAlias.Sum).WithAlias(() => resultAlias.Sum)
 				   .Select(() => onlineOrderAlias.Comments).WithAlias(() => resultAlias.Comment)
+				   .Select(() => orderAlias.Id).WithAlias(() => resultAlias.OrderId)
+				   .Select(() => onlineClientAlias.Id).WithAlias(() => resultAlias.OnlineClientId)
+				   .Select(() => counterpartyAlias.Id).WithAlias(() => resultAlias.CounterpartyId)
 				).OrderBy(x => x.DateOfStatusChange).Desc
 				.TransformUsing(Transformers.AliasToBean<OnlineOrdersVMNode>())
 				.List<OnlineOrdersVMNode>();
@@ -103,23 +106,22 @@ namespace Vodovoz.Representations
 
 		public int? OrderId { get; set; }
 		public int? CounterpartyId { get; set; }
+		public int? OnlineClientId { get; set; }
 
-		[UseForSearch]
-		[SearchHighlight]
 		public string Counterparty { get; set; }
 
-		[UseForSearch]
-		[SearchHighlight]
 		public string CounterpartyOnline { get; set; }
 
+		[UseForSearch]
+		[SearchHighlight]
 		public string Client => String.IsNullOrWhiteSpace(Counterparty) ? CounterpartyOnline : Counterparty;
 
 		public decimal Sum { get; set; }
 
-		public string Comment { get; set; }
-
 		[UseForSearch]
 		[SearchHighlight]
+		public string Comment { get; set; }
+
 		public DateTime LastEditedTime { get; set; }
 
 		public string RowColor {

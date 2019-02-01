@@ -265,6 +265,16 @@ namespace Vodovoz.Repository
 					  .List().FirstOrDefault();
 		}
 
+		//internal static Func<IUnitOfWork, string, Domain.Orders.Order> GetOrderByOnlineStoreIdTestGap;
+		//public static Domain.Orders.Order GetOrderByOnlineStoreId(IUnitOfWork uow, string onlineStoreId)
+		//{
+		//	if(GetOrderByOnlineStoreIdTestGap != null)
+		//		return GetOrderByOnlineStoreIdTestGap(uow, onlineStoreId);
+
+		//	return uow.Session.QueryOver<Domain.Orders.Order>()
+		//		.Where(x => x.OnlineStoreId == onlineStoreId)
+		//		.SingleOrDefault();
+		//}
 
 		public static OrderStatus[] GetOnClosingOrderStatuses()
 		{

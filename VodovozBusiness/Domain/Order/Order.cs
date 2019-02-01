@@ -5,6 +5,7 @@ using System.Data.Bindings.Collections.Generic;
 using System.Linq;
 using Gamma.Utilities;
 using NHibernate.Util;
+using QS.Dialog;
 using QS.DomainModel.Entity;
 using QS.DomainModel.UoW;
 using QS.HistoryLog;
@@ -15,6 +16,7 @@ using Vodovoz.Domain.Documents;
 using Vodovoz.Domain.Employees;
 using Vodovoz.Domain.Goods;
 using Vodovoz.Domain.Logistic;
+using Vodovoz.Domain.OnlineStore;
 using Vodovoz.Domain.Operations;
 using Vodovoz.Domain.Orders.Documents;
 using Vodovoz.Domain.Service;
@@ -579,6 +581,8 @@ namespace Vodovoz.Domain.Orders
 				&& (!NHibernate.NHibernateUtil.IsInitialized(FinalOrderService) || !FinalOrderService.Any());
 		}
 
+		#region Коллекции
+
 		IList<OrderDepositItem> orderDepositItems = new List<OrderDepositItem>();
 
 		[Display(Name = "Залоги заказа")]
@@ -691,6 +695,8 @@ namespace Vodovoz.Domain.Orders
 				return observableFinalOrderService;
 			}
 		}
+
+		#endregion
 
 		public Order()
 		{
@@ -1993,6 +1999,23 @@ namespace Vodovoz.Domain.Orders
 						break;
 				}
 			}
+		}
+
+		#endregion
+
+		#region Онлайн магазин
+
+		public virtual void NewOrderFromOnlineOrder(IInteractiveMessage interactive, OnlineOrder onlineOrder)
+		{
+			OrderSource = OrderSource.OnlineStore;
+			Client = onlineOrder.OnlineClient.Counterparty;
+			Comment = onlineOrder.Comments;
+			foreach(var item in onlineOrder.Items) {
+				var orderItem = AddAnyGoodsNomenclatureForSale(item.Nomenclature, item.Amount);
+				orderItem.Price = item.Price;
+			}
+			if(onlineOrder.Sum != TotalSum)
+				interactive.ShowMessage(ImportanceLevel.Error, $"Проверьте созданный заказ! Так как сумма заказа на сайте {onlineOrder.Sum:C}, отличается от суммы созданного заказа {TotalSum:C}.");
 		}
 
 		#endregion

@@ -37,6 +37,7 @@ using Vodovoz.Domain.Client;
 using Vodovoz.Domain.Employees;
 using Vodovoz.Domain.Goods;
 using Vodovoz.Domain.Logistic;
+using Vodovoz.Domain.OnlineStore;
 using Vodovoz.Domain.Orders;
 using Vodovoz.Domain.Orders.Documents;
 using Vodovoz.Domain.Service;
@@ -124,6 +125,11 @@ namespace Vodovoz
 
 		public OrderDlg(Order sub) : this(sub.Id)
 		{ }
+
+		public OrderDlg(OnlineOrder onlineOrder) : this()
+		{
+			Entity.NewOrderFromOnlineOrder(new GtkMessageDialogsInteractive(), onlineOrder);
+		}
 
 		public void CopyOrderFrom(int id)
 		{
@@ -2078,7 +2084,7 @@ namespace Vodovoz
 		public void OnTabAdded()
 		{
 			//если новый заказ и не создан из недовоза (templateOrder заполняется только из недовоза)
-			if(UoW.IsNew && templateOrder == null)
+			if(UoW.IsNew && templateOrder == null && Entity.Client == null)
 				//открыть окно выбора контрагента
 				referenceClient.OpenSelectDialog();
 		}

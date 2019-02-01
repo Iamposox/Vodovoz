@@ -217,8 +217,8 @@ namespace Vodovoz.Tools.CommerceML
 			Results.Add($"Загружено заказов: {reader.Orders.Count}");
 
 			OnProgressPlusOneTask("Отправляем ответ о загрузке заказов");
-			request = new RestRequest("1c_exchange.php?type=sale&mode=success", Method.GET);
-			response = client.Execute(request);
+			//request = new RestRequest("1c_exchange.php?type=sale&mode=success", Method.GET);
+			//response = client.Execute(request);
 			DebugResponse(response);
 		}
 

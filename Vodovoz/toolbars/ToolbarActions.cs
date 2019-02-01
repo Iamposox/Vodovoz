@@ -547,7 +547,7 @@ public partial class MainWindow : Window
 
 	void ActionOnlineOrders_Activated(object sender, System.EventArgs e)
 	{
-		tdiMain.OpenTab<RepresentationJournalDialog, IRepresentationModel>(new OnlineOrdersVM());
+		tdiMain.OpenTab<OnlineOrdersJournal>();
 	}
 
 	void ActionUndeliveredOrdersActivated(object sender, System.EventArgs e)

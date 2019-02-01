@@ -108,6 +108,7 @@
     <Folder Include="Tools\" />
     <Folder Include="Tools\Orders\" />
     <Folder Include="Tools\CommerceML\" />
+    <Folder Include="OnlineStore\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Counterparties\CounterpartyTests.cs" />
@@ -117,6 +118,7 @@
     <Compile Include="ConfigureOneTime.cs" />
     <Compile Include="Tools\Orders\OrderStateKeyTests.cs" />
     <Compile Include="Tools\CommerceML\OrdersReaderTests.cs" />
+    <Compile Include="OnlineStore\OrderTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VodovozBusiness\VodovozBusiness.csproj">
