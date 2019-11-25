@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Gtk;
 using QS.Dialog.GtkUI;
-using QS.Journal.GtkUI;
 using QS.Project.Filter;
 using QS.RepresentationModel;
 using QS.Tdi;
@@ -12,7 +11,7 @@ using Vodovoz.Infrastructure.Services;
 
 namespace Vodovoz.Core
 {
-	public class ViewModelWidgetResolver : ITDIWidgetResolver, IFilterWidgetResolver, IWidgetResolver
+	public class ViewModelWidgetResolver : DefaultTDIWidgetResolver, IFilterWidgetResolver
 	{
 		private static ViewModelWidgetResolver instance;
 		public static ViewModelWidgetResolver Instance {
@@ -31,13 +30,10 @@ namespace Vodovoz.Core
 
 		private Dictionary<Type, Type> viewModelWidgets = new Dictionary<Type, Type>();
 
-		public virtual Widget Resolve(ITdiTab tab)
+		public override Widget Resolve(ITdiTab tab)
 		{
-			if(tab is Widget) {
-				return (Widget)tab;
-			}
-
-			if(JournalViewFactory.TryCreateView(out Widget widget, tab)) {
+			Widget widget = base.Resolve(tab);
+			if(widget != null) {
 				return widget;
 			}
 
@@ -54,6 +50,27 @@ namespace Vodovoz.Core
 			widget = (Widget)widgetCtorInfo.Invoke(new object[] { tab });
 			return widget;
 		}
+
+		public override Widget Resolve(ViewModelBase viewModel)
+		{
+			if(viewModel == null) {
+				return null;
+			}
+
+			Widget widget = base.Resolve(viewModel);
+			if(widget != null) {
+				return widget;
+			}
+
+			Type filterType = viewModel.GetType();
+			if(!viewModelWidgets.ContainsKey(filterType)) {
+				throw new ApplicationException($"Не настроено сопоставление для {filterType.Name}");
+			}
+
+			var widgetCtorInfo = viewModelWidgets[filterType].GetConstructor(new[] { filterType });		 
+			return (Widget)widgetCtorInfo.Invoke(new object[] { viewModel });
+		}
+
 
 		public virtual Widget Resolve(IJournalFilter filter)
 		{
@@ -124,6 +141,20 @@ namespace Vodovoz.Core
 		}
 
 		public virtual ViewModelWidgetResolver RegisterWidgetForWidgetViewModel<TViewModel, TWidget>()
+			where TViewModel : ViewModelBase
+			where TWidget : Widget
+		{
+			Type viewModelType = typeof(TViewModel);
+			Type widgetType = typeof(TWidget);
+			if(viewModelWidgets.ContainsKey(viewModelType)) {
+				throw new InvalidOperationException($"Модель представления {viewModelType.Name} уже зарегистрирована");
+			}
+			viewModelWidgets.Add(viewModelType, widgetType);
+
+			return this;
+		}
+
+		public virtual ViewModelWidgetResolver RegisterWidgetForViewModel<TViewModel, TWidget>()
 			where TViewModel : ViewModelBase
 			where TWidget : Widget
 		{

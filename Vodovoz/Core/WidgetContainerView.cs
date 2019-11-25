@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using Gamma.Binding.Core;
 using Gtk;
+using QS.Navigation.GtkUI;
 using QS.ViewModels;
 
 namespace Vodovoz.Core
