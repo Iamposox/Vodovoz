@@ -70,6 +70,53 @@ using ToolbarStyle = Vodovoz.Domain.Employees.ToolbarStyle;
 using QSSupportLib;
 using Vodovoz.ReportsParameters.Sales;
 using Vodovoz.Domain.Service.BaseParametersServices;
+using QS.Navigation.GtkUI;
+using QS.Navigation.TabNavigation;
+using QS.Navigation;
+using QS.ViewModels;
+using System.Collections.Generic;
+using QS.Services;
+using QS.Navigation.TabNavigation.TdiAdapter;
+
+public class ViewModelPageFactory : IViewModelsPageFactory
+{
+	public IPage<TViewModel> CreateViewModelNamedArgs<TViewModel>(ViewModelBase master, IDictionary<string, object> ctorArgs, string hash) where TViewModel : ViewModelBase
+	{
+		throw new NotImplementedException();
+	}
+
+	public IPage CreateViewModelNamedArgs(Type viewModelType, ViewModelBase master, IDictionary<string, object> ctorArgs, string hash)
+	{
+		throw new NotImplementedException();
+	}
+
+	public IPage<TViewModel> CreateViewModelTypedArgs<TViewModel>(ViewModelBase master, Type[] ctorTypes, object[] ctorValues, string hash) where TViewModel : ViewModelBase
+	{
+		Type viewModelType = typeof(TViewModel);
+		TViewModel viewModel = null;
+		try {
+			viewModel = (TViewModel)Activator.CreateInstance(viewModelType, ctorValues);
+		} catch(AbortCreatingPageException ex) when(viewModelType == typeof(TdiTabViewModelAdapter)) {
+			return null;
+		}
+
+		var page = new Page<TViewModel>(viewModel, hash);
+		return page;
+	}
+
+	public IPage CreateViewModelTypedArgs(Type viewModelType, ViewModelBase master, Type[] ctorTypes, object[] ctorValues, string hash)
+	{
+		ViewModelBase viewModel = null;
+		try {
+			viewModel = (ViewModelBase)Activator.CreateInstance(viewModelType, ctorValues);
+		} catch(AbortCreatingPageException ex) when (viewModelType == typeof(TdiTabViewModelAdapter)) {
+			return null;
+		}
+
+		var page = new Page<ViewModelBase>(viewModel, hash);
+		return page;
+	}
+}
 
 public partial class MainWindow : Gtk.Window, IProgressBarDisplayable
 {
@@ -78,12 +125,22 @@ public partial class MainWindow : Gtk.Window, IProgressBarDisplayable
 
 	public TdiNotebook TdiMain => tdiMain;
 
+	INavigationManager tabNavigator = null;
+
 	public MainWindow() : base(Gtk.WindowType.Toplevel)
 	{
 		Build();
 		PerformanceHelper.AddTimePoint("Закончена стандартная сборка окна.");
 		this.BuildToolbarActions();
 		this.KeyReleaseEvent += ClipboardWorkaround.HandleKeyReleaseEvent;
+
+		IPageHashGenerator pageHashGenerator = new ClassNamesHashGenerator(null);
+		IViewModelsPageFactory viewModelsPageFactory = new ViewModelPageFactory();
+		var nav = new TabNavigator(pageHashGenerator, viewModelsPageFactory, ServicesConfig.InteractiveService);
+		var tdiNav = new TdiCompatibilityNavigator(nav, ServicesConfig.InteractiveService);
+		tabNavigator = tdiNav;
+		tabnavigatorview1.WidgetResolver = ViewModelWidgetResolver.Instance;
+		tabnavigatorview1.TabNavigatorViewModel = new QS.Navigation.TabNavigation.TabNavigatorViewModel(nav, ServicesConfig.InteractiveService);
 		tdiMain.WidgetResolver = ViewModelWidgetResolver.Instance;
 		TDIMain.MainNotebook = tdiMain;
 		this.KeyReleaseEvent += TDIMain.TDIHandleKeyReleaseEvent;
@@ -1464,12 +1521,13 @@ public partial class MainWindow : Gtk.Window, IProgressBarDisplayable
 
 	protected void OnActionSalesPlansActivated(object sender, EventArgs e)
 	{
-		tdiMain.AddTab(
+		tabNavigator.OpenViewModel<SalesPlanJournalViewModel, IUnitOfWorkFactory, ICommonServices>(null, UnitOfWorkFactory.GetDefaultFactory, ServicesConfig.CommonServices);
+		/*tdiMain.AddTab(
 			new SalesPlanJournalViewModel(
 				UnitOfWorkFactory.GetDefaultFactory,
 				ServicesConfig.CommonServices
 			)
-		);
+		);*/
 	}
 
 	protected void OnActionZeroDebtClientReportActivated(object sender, EventArgs e)
