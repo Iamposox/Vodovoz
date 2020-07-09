@@ -173,6 +173,21 @@ namespace Vodovoz.Core.DataService
 			return balance;
 		}
 
+		public DateTime DontRecalculateWagesForRouteListsBefore {
+			get {
+				if(!ParametersProvider.Instance.ContainsParameter("dont_recalculate_wages_for_route_lists_before")) {
+					throw new InvalidProgramException("В параметрах базы не указана дата до которой будет действовать запрет расчета зарплаты в МЛ (dont_recalculate_wages_for_route_lists_before).");
+				}
+				string balanceString = ParametersProvider.Instance.GetParameterValue("dont_recalculate_wages_for_route_lists_before");
+
+				
+				if(!DateTime.TryParse(balanceString, CultureInfo.CreateSpecificCulture("ru-RU"), DateTimeStyles.None, out DateTime date)) {
+					throw new InvalidProgramException("В параметрах базы неверно заполнена дата до которой будет действовать запрет расчета зарплаты в МЛ (dont_recalculate_wages_for_route_lists_before)");
+				}
+				return date;
+			}
+		}
+
 		#endregion IWageParametersProvider implementation
 
 

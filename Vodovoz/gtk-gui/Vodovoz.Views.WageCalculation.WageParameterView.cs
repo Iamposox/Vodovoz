@@ -18,6 +18,8 @@ namespace Vodovoz.Views.WageCalculation
 
 		private global::Gamma.Widgets.yEnumComboBox comboWageType;
 
+		private global::Gtk.Notebook notebook1;
+
 		protected virtual void Build()
 		{
 			global::Stetic.Gui.Initialize(this);
@@ -94,6 +96,16 @@ namespace Vodovoz.Views.WageCalculation
 			w8.Position = 1;
 			w8.Expand = false;
 			w8.Fill = false;
+			// Container child vboxDialog.Gtk.Box+BoxChild
+			this.notebook1 = new global::Gtk.Notebook();
+			this.notebook1.CanFocus = true;
+			this.notebook1.Name = "notebook1";
+			this.notebook1.CurrentPage = -1;
+			this.vboxDialog.Add(this.notebook1);
+			global::Gtk.Box.BoxChild w9 = ((global::Gtk.Box.BoxChild)(this.vboxDialog[this.notebook1]));
+			w9.Position = 2;
+			w9.Expand = false;
+			w9.Fill = false;
 			this.Add(this.vboxDialog);
 			if ((this.Child != null))
 			{
