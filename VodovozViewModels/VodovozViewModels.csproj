@@ -215,6 +215,7 @@
     <Compile Include="Journals\JournalViewModels\EmptyClass.cs" />
     <Compile Include="Journals\Cash\FuelDocumentsJournalViewModel.cs" />
     <Compile Include="Journals\Nodes\Cash\FuelDocumentJournalNode.cs" />
+    <Compile Include="Dialogs\Cash\CashIncomeViewModel.cs" />
     <Compile Include="Journals\Filters\Employees\EmployeeFilterViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
