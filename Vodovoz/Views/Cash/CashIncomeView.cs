@@ -59,6 +59,9 @@ namespace Vodovoz.Views.Cash
 			comboIncomeCategory.Binding.AddBinding(ViewModel.Entity, s => s.IncomeCategory, w => w.SelectedItem).InitializeFromSource();
 			comboIncomeCategory.Binding.AddBinding(ViewModel, vm => vm.CanEdit, w => w.Sensitive).InitializeFromSource();
 
+			comboCashSubdivision.Binding.AddBinding(ViewModel.Entity, e => e.RelatedToSubdivision, w => w.SelectedItem).InitializeFromSource();
+			comboCashSubdivision.Binding.AddBinding(ViewModel, vm => vm.CanEdit, w => w.Sensitive).InitializeFromSource();
+
 			checkNoClose.Binding.AddBinding(ViewModel, vm => vm.IsPartialDebtReturn, w => w.Active);
 			checkNoClose.Binding.AddBinding(ViewModel, vm => vm.CanEdit, w => w.Sensitive).InitializeFromSource();
 			checkNoClose.Binding.AddBinding(ViewModel, vm => vm.CanSelectDebts, w => w.Visible).InitializeFromSource();

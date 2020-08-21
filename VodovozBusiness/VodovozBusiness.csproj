@@ -791,6 +791,8 @@
     <Compile Include="Domain\Service\BaseParametersServices\CashCategoryParametersProvider.cs" />
     <Compile Include="Services\ICashCategoryParametersProvider.cs" />
     <Compile Include="Parameters\IParametersProvider.cs" />
+    <Compile Include="Services\IAvailableCashSubdivisionProvider.cs" />
+    <Compile Include="ServicesImplementations\AvailableCashSubdivisionForEmployeeProvider.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -875,6 +877,7 @@
     <Folder Include="Domain\BusinessTasks\" />
     <Folder Include="HibernateMapping\BusinessTasks\" />
     <Folder Include="Domain\Orders\OrdersWithoutShipment\" />
+    <Folder Include="ServicesImplementations\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\QSProjects\Modules\QS.BusinessCommon\QS.BusinessCommon.csproj">

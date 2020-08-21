@@ -18,6 +18,7 @@ using Vodovoz.Domain.Logistic;
 using Vodovoz.EntityRepositories.Cash;
 using Vodovoz.Infrastructure.Services;
 using Vodovoz.PermissionExtensions;
+using Vodovoz.Services;
 using Vodovoz.TempAdapters;
 
 namespace Vodovoz.ViewModels.Dialogs.Cash
@@ -33,10 +34,12 @@ namespace Vodovoz.ViewModels.Dialogs.Cash
 		private readonly ICashCategoryRepository cashCategoryRepository;
 		private readonly IEmployeeJournalFactory employeeJournalFactory;
 		private readonly ICounterpartyJournalFactory counterpartyJournalFactory;
-		private readonly IPermissionResult permissionResult;
+		private readonly IAvailableCashSubdivisionProvider availableCashSubdivisionProvider;
 		private readonly IInteractiveService interactiveService;
 		private readonly IUserService userService;
-		private readonly bool canEditRectroactively;
+
+		private IPermissionResult permissionResult;
+		private bool canEditRectroactively;
 
 		public CashIncomeViewModel(
 			IEntityUoWBuilder uowBuilder, 
@@ -49,6 +52,7 @@ namespace Vodovoz.ViewModels.Dialogs.Cash
 			ICashCategoryRepository cashCategoryRepository,
 			IEmployeeJournalFactory employeeJournalFactory,
 			ICounterpartyJournalFactory counterpartyJournalFactory,
+			IAvailableCashSubdivisionProvider availableCashSubdivisionProvider,
 			INavigationManager navigation = null)
 		: base(uowBuilder, unitOfWorkFactory, commonServices, navigation)
 		{
@@ -59,30 +63,62 @@ namespace Vodovoz.ViewModels.Dialogs.Cash
 			this.cashCategoryRepository = cashCategoryRepository ?? throw new ArgumentNullException(nameof(cashCategoryRepository));
 			this.employeeJournalFactory = employeeJournalFactory ?? throw new ArgumentNullException(nameof(employeeJournalFactory));
 			this.counterpartyJournalFactory = counterpartyJournalFactory ?? throw new ArgumentNullException(nameof(counterpartyJournalFactory));
+			this.availableCashSubdivisionProvider = availableCashSubdivisionProvider ?? throw new ArgumentNullException(nameof(availableCashSubdivisionProvider));
 			this.interactiveService = commonServices.InteractiveService;
 			this.userService = commonServices.UserService;
 
+			if(!ValidateAndSetCashier()) {
+				return;
+			}
+
+			if(!ValidatePermissions()) {
+				return;
+			}
+
+			if(!ValidateAndSetAvailableCashSubdivisions()) {
+				return;
+			}
+
+			if(uowBuilder.IsNewEntity) {
+				Entity.Date = DateTime.Now;
+			}
+
+			ConfigureDlg();
+			SubscribesOnChanges();
+		}
+
+		#region Init
+
+		private bool ValidateAndSetCashier()
+		{
+			if(!UoW.IsNew) {
+				return true;
+			}
 			Entity.Casher = employeeService.GetEmployeeForCurrentUser(UoW);
 			if(Entity.Casher == null) {
 				interactiveService.ShowMessage(
-					ImportanceLevel.Error, 
+					ImportanceLevel.Error,
 					"Ваш пользователь не привязан к действующему сотруднику, " +
 					"вы не можете создавать кассовые документы, " +
 					"так как некого указывать в качестве кассира."
 				);
 				FailInitialize = true;
-				return;
+				return false;
 			}
+			return true;
+		}
 
-			permissionResult = commonServices.PermissionService.ValidateUserPermission(typeof(Income), userService.CurrentUserId);
-			if(uowBuilder.IsNewEntity) {
+		private bool ValidatePermissions()
+		{
+			permissionResult = CommonServices.PermissionService.ValidateUserPermission(typeof(Income), userService.CurrentUserId);
+			if(UoW.IsNew) {
 				if(!permissionResult.CanCreate) {
 					interactiveService.ShowMessage(
 						ImportanceLevel.Error,
 						"Отсутствуют права на создание приходного ордера"
 					);
 					FailInitialize = true;
-					return;
+					return false;
 				}
 			} else {
 				if(!permissionResult.CanRead) {
@@ -91,29 +127,38 @@ namespace Vodovoz.ViewModels.Dialogs.Cash
 						"Отсутствуют права на просмотр приходного ордера"
 					);
 					FailInitialize = true;
-					return;
+					return false;
 				}
 
 				canEditRectroactively = entityExtendedPermissionValidator.Validate(
 					typeof(Income),
-					userService.CurrentUserId, 
+					userService.CurrentUserId,
 					new RetroactivelyClosePermission()
 				);
 			}
+			return true;
+		}
 
-			// Настроить виджет доступных подразделений кассы
-			//if(!accessfilteredsubdivisionselectorwidget.Configure(UoW, false, typeof(Income))) {
-			//	MessageDialogHelper.RunErrorDialog(accessfilteredsubdivisionselectorwidget.ValidationErrorMessage);
-			//	FailInitialize = true;
-			//	return;
-			//}
-
-			if(uowBuilder.IsNewEntity) {
-				Entity.Date = DateTime.Now;
+		private bool ValidateAndSetAvailableCashSubdivisions()
+		{
+			if(UoW.IsNew) {
+				availableCashSubdivisions = availableCashSubdivisionProvider.GetAvailableCashSubdivisions(UoW, typeof(Income)).ToList();
+				if(!availableCashSubdivisions.Any()) {
+					interactiveService.ShowMessage(
+							ImportanceLevel.Error,
+							"Невозможно создать приходный ордер, так как у вас нет прав ни на одну из касс"
+						);
+					FailInitialize = true;
+					return false;
+				}
+				Entity.RelatedToSubdivision = availableCashSubdivisions.First();
+			} else {
+				if(!availableCashSubdivisions.Contains(Entity.RelatedToSubdivision)) {
+					availableCashSubdivisions.Add(Entity.RelatedToSubdivision);
+				}
 			}
 
-			ConfigureDlg();
-			SubscribesOnChanges();
+			return true;
 		}
 
 		private void ConfigureDlg()
@@ -132,12 +177,17 @@ namespace Vodovoz.ViewModels.Dialogs.Cash
 			SetPropertyChangeRelation(e => e.RouteListClosing, () => ClosingRouteList);
 		}
 
+		#endregion Init
+
 		protected override void BeforeSave()
 		{
 			if(Entity.TypeOperation == IncomeType.Return && UoW.IsNew) {
 				Entity.CloseAdvances(UoW);
 			}
 		}
+
+		private IList<Subdivision> availableCashSubdivisions;
+		public IEnumerable<Subdivision> AvailableCashSubdivisions => availableCashSubdivisions;
 
 		#region State
 
@@ -149,7 +199,6 @@ namespace Vodovoz.ViewModels.Dialogs.Cash
 		public bool CanEditMoney => CanEdit && (!IsDebtReturn || (IsDebtReturn && IsPartialDebtReturn));
 		public bool CanSelectDebts => CanEdit && IsDebtReturn && UoW.IsNew;
 
-
 		public bool IsPayment => Entity.TypeOperation == IncomeType.Payment;
 
 		public bool IsDriverReport => Entity.TypeOperation == IncomeType.DriverReport;
@@ -158,7 +207,6 @@ namespace Vodovoz.ViewModels.Dialogs.Cash
 		public bool IsDebtReturn => Entity.TypeOperation == IncomeType.Return;
 
 		public bool IsCommonIncome => Entity.TypeOperation == IncomeType.Common;
-
 
 		private IncomeType typeOperation;
 		public virtual IncomeType TypeOperation {

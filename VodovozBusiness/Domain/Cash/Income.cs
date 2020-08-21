@@ -206,39 +206,6 @@ namespace Vodovoz.Domain.Cash
 			}
 		}
 
-		public virtual void PrepareCloseAdvance(List<Expense> advances)
-		{
-			if (TypeOperation != IncomeType.Return)
-				throw new InvalidOperationException("Метод PrepareCloseAdvance() можно вызываться только для возврата аванса.");
-
-			AdvanceForClosing = advances;
-		}
-
-		public virtual void CloseAdvances(IUnitOfWork uow)
-		{
-			if(TypeOperation != IncomeType.Return) {
-				return;
-			}
-
-			if(IsPartialDebtReturn)
-			{
-				var advance = Debts.FirstOrDefault(x => x.Selected)?.Value;
-				if(advance == null) {
-					return;
-				}
-				advance.AddAdvanceCloseItem(this, Money);
-				uow.Save(advance);
-			}
-			else
-			{
-				foreach(var advance in Debts.Where(x => x.Selected).Select(x => x.Value))
-				{
-					advance.AddAdvanceCloseItem(this, advance.Money - advance.ClosedMoney);
-					uow.Save(advance);
-				}
-			}
-		}
-
 		public virtual void FillFromOrder(IUnitOfWork uow)
 		{
 			if(Id == 0) {
@@ -321,6 +288,27 @@ namespace Vodovoz.Domain.Cash
 			}
 		}
 
+		public virtual void CloseAdvances(IUnitOfWork uow)
+		{
+			if(TypeOperation != IncomeType.Return) {
+				return;
+			}
+
+			if(IsPartialDebtReturn) {
+				var advance = Debts.FirstOrDefault(x => x.Selected)?.Value;
+				if(advance == null) {
+					return;
+				}
+				advance.AddAdvanceCloseItem(this, Money);
+				uow.Save(advance);
+			} else {
+				foreach(var advance in Debts.Where(x => x.Selected).Select(x => x.Value)) {
+					advance.AddAdvanceCloseItem(this, advance.Money - advance.ClosedMoney);
+					uow.Save(advance);
+				}
+			}
+		}
+
 		#endregion Debts return
 
 		#region Driver report
@@ -336,11 +324,6 @@ namespace Vodovoz.Domain.Cash
 				Description = $"Приход по МЛ №{RouteListClosing.Id} от {RouteListClosing.Date:d}";
 				Employee = RouteListClosing.Driver;
 			}
-		}
-
-		private void FillRouteListInfo()
-		{
-
 		}
 
 		#endregion Driver report
