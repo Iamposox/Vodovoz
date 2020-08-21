@@ -635,7 +635,7 @@ public partial class MainWindow
 		this.ActionIconsSmall.ShortLabel = global::Mono.Unix.Catalog.GetString("Маленькие иконки");
 		w1.Add(this.ActionIconsSmall, null);
 		this.ActionIconsMiddle = new global::Gtk.RadioAction("ActionIconsMiddle", global::Mono.Unix.Catalog.GetString("Средние иконки"), null, null, 0);
-		this.ActionIconsMiddle.Group = this.ActionIconsExtraSmall.Group;
+		this.ActionIconsMiddle.Group = this.ActionIconsSmall.Group;
 		this.ActionIconsMiddle.ShortLabel = global::Mono.Unix.Catalog.GetString("Средние иконки");
 		w1.Add(this.ActionIconsMiddle, null);
 		this.ActionIconsLarge = new global::Gtk.RadioAction("ActionIconsLarge", global::Mono.Unix.Catalog.GetString("Большие иконки"), null, null, 0);
@@ -986,7 +986,7 @@ public partial class MainWindow
 		this.Action62 = new global::Gtk.Action("Action62", global::Mono.Unix.Catalog.GetString("Переотправка почты"), null, null);
 		this.Action62.ShortLabel = global::Mono.Unix.Catalog.GetString("Переотправка почты");
 		w1.Add(this.Action62, null);
-		this.ActionComplaints = new global::Gtk.Action("ActionComplaints", global::Mono.Unix.Catalog.GetString("Рекламации"), null, "complaints");
+		this.ActionComplaints = new global::Gtk.Action("ActionComplaints", global::Mono.Unix.Catalog.GetString("рекламации"), null, "complaints");
 		this.ActionComplaints.ShortLabel = global::Mono.Unix.Catalog.GetString("Рекламации");
 		w1.Add(this.ActionComplaints, null);
 		this.ActionComplaintSources = new global::Gtk.Action("ActionComplaintSources", global::Mono.Unix.Catalog.GetString("Источники рекламаций"), null, null);
@@ -996,7 +996,7 @@ public partial class MainWindow
 		this.ActionComplaintResult.ShortLabel = global::Mono.Unix.Catalog.GetString("Результаты рассмотрения рекламаций");
 		w1.Add(this.ActionComplaintResult, null);
 		this.ActionSuppliers = new global::Gtk.RadioAction("ActionSuppliers", global::Mono.Unix.Catalog.GetString("Закупки"), null, "suppliers", 0);
-		this.ActionSuppliers.Group = this.ActionCRM.Group;
+		this.ActionSuppliers.Group = this.ActionServices.Group;
 		this.ActionSuppliers.ShortLabel = global::Mono.Unix.Catalog.GetString("Закупки");
 		w1.Add(this.ActionSuppliers, null);
 		this.ActionWarehouses = new global::Gtk.Action("ActionWarehouses", global::Mono.Unix.Catalog.GetString("Склады"), null, null);

@@ -15,6 +15,7 @@ using Vodovoz.Domain.Logistic;
 using Vodovoz.Filters.ViewModels;
 using Vodovoz.JournalViewModels;
 using Vodovoz.ViewModel;
+using Vodovoz.ViewModels.Journals.Filters.Employees;
 
 namespace Vodovoz.ReportsParameters.Logistic
 {

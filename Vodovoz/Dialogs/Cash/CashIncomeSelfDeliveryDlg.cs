@@ -138,7 +138,7 @@ namespace Vodovoz.Dialogs.Cash
 			enumcomboOperation.Sensitive = false;
 			Entity.TypeOperation = IncomeType.Payment;
 
-			var filterCasher = new EmployeeFilterViewModel();
+			var filterCasher = new OldEmployeeFilterViewModel();
 			filterCasher.Status = Domain.Employees.EmployeeStatus.IsWorking;
 			yentryCasher.RepresentationModel = new EmployeesVM(filterCasher);
 			yentryCasher.Binding.AddBinding(Entity, s => s.Casher, w => w.Subject).InitializeFromSource();

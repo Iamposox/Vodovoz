@@ -88,7 +88,7 @@ namespace Vodovoz.ReportsParameters
 
 		protected void OnRadioCatAllToggled(object sender, EventArgs e)
 		{
-			var filter = new EmployeeFilterViewModel();
+			var filter = new OldEmployeeFilterViewModel();
 			if(radioCatDriver.Active) {
 				filter.SetAndRefilterAtOnce(x => x.RestrictCategory = EmployeeCategory.driver);
 			}

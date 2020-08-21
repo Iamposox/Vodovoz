@@ -15,7 +15,7 @@ namespace Vodovoz
 		{
 			yentryExpense.ItemsQuery = Repository.Cash.CategoryRepository.ExpenseCategoriesQuery();
 
-			var filter = new EmployeeFilterViewModel();
+			var filter = new OldEmployeeFilterViewModel();
 			filter.SetAndRefilterAtOnce(x => x.Status = EmployeeStatus.IsWorking);
 			repEntryAccountable.RepresentationModel = new EmployeesVM(filter);
 		}

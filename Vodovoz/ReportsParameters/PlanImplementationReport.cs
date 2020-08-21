@@ -15,7 +15,7 @@ namespace Vodovoz.ReportsParameters
 {
 	public partial class PlanImplementationReport : SingleUoWWidgetBase, IParametersWidget
 	{
-		EmployeeFilterViewModel filter;
+		OldEmployeeFilterViewModel filter;
 		public PlanImplementationReport(bool orderById = false)
 		{
 			this.Build();
@@ -28,7 +28,7 @@ namespace Vodovoz.ReportsParameters
 			dateperiodpicker.StartDate = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
 			dateperiodpicker.EndDate = dateperiodpicker.StartDate.AddMonths(1).AddTicks(-1);
 
-			filter = new EmployeeFilterViewModel();
+			filter = new OldEmployeeFilterViewModel();
 
 			var availablePlansToUse = new[] { WageParameterItemTypes.SalesPlan };
 			lstCmbPlanType.SetRenderTextFunc<WageParameterItemTypes>(t => t.GetEnumTitle());

@@ -21,6 +21,7 @@ using Vodovoz.Filters.ViewModels;
 using QS.Project.Journal.EntitySelector;
 using Vodovoz.Domain.Employees;
 using Vodovoz.JournalViewModels;
+using Vodovoz.ViewModels.Journals.Filters.Employees;
 
 namespace Vodovoz.ViewModels.BusinessTasks
 {

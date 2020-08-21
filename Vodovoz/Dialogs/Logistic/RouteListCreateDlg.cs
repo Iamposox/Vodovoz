@@ -124,7 +124,7 @@ namespace Vodovoz
 				}
 			};
 
-			var filterDriver = new EmployeeFilterViewModel();
+			var filterDriver = new OldEmployeeFilterViewModel();
 			filterDriver.SetAndRefilterAtOnce(
 				x => x.RestrictCategory = EmployeeCategory.driver,
 				x => x.Status = EmployeeStatus.IsWorking,
@@ -133,7 +133,7 @@ namespace Vodovoz
 			referenceDriver.RepresentationModel = new EmployeesVM(filterDriver);
 			referenceDriver.Binding.AddBinding(Entity, e => e.Driver, w => w.Subject).InitializeFromSource();
 
-			var filter = new EmployeeFilterViewModel();
+			var filter = new OldEmployeeFilterViewModel();
 			filter.SetAndRefilterAtOnce(
 				x => x.RestrictCategory = EmployeeCategory.forwarder,
 				x => x.Status = EmployeeStatus.IsWorking,

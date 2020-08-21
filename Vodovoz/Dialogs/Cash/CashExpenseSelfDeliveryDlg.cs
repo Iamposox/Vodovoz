@@ -144,7 +144,7 @@ namespace Vodovoz.Dialogs.Cash
 			yentryOrder.RepresentationModel = new OrdersVM(filterOrders);
 			yentryOrder.Binding.AddBinding(Entity, x => x.Order, x => x.Subject).InitializeFromSource();
 
-			var filterCasher = new EmployeeFilterViewModel();
+			var filterCasher = new OldEmployeeFilterViewModel();
 			filterCasher.Status = Domain.Employees.EmployeeStatus.IsWorking;
 			yentryCasher.RepresentationModel = new EmployeesVM(filterCasher);
 			yentryCasher.Binding.AddBinding(Entity, s => s.Casher, w => w.Subject).InitializeFromSource();

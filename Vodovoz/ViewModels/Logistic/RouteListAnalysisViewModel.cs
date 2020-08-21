@@ -14,13 +14,13 @@ using Vodovoz.Domain.Orders;
 using QS.Commands;
 using QS.Dialog;
 using QS.Project.Journal;
-using Vodovoz.FilterViewModels.Employees;
 using Vodovoz.Infrastructure.Services;
 using Vodovoz.Journals.JournalViewModels.Employees;
 using Vodovoz.JournalViewers;
 using Vodovoz.Repositories;
 using Vodovoz.TempAdapters;
 using Vodovoz.ViewModels.Employees;
+using Vodovoz.ViewModels.Journals.Filters.Employees;
 
 namespace Vodovoz.ViewModels.Logistic
 {

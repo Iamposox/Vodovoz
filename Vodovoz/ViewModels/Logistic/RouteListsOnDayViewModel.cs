@@ -36,6 +36,7 @@ using Vodovoz.Core.DataService;
 using Vodovoz.Services;
 using Vodovoz.EntityRepositories;
 using Vodovoz.JournalViewModels;
+using Vodovoz.ViewModels.Journals.Filters.Employees;
 
 namespace Vodovoz.ViewModels.Logistic
 {

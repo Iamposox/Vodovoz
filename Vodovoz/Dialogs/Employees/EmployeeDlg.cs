@@ -44,6 +44,7 @@ using Vodovoz.FilterViewModels.Organization;
 using Vodovoz.Journals.FilterViewModels;
 using Vodovoz.Journals.JournalViewModels;
 using Vodovoz.JournalViewModels;
+using Vodovoz.ViewModels.Journals.Filters.Employees;
 
 namespace Vodovoz
 {
@@ -126,7 +127,7 @@ namespace Vodovoz
 			dataentryAndroidLogin.Binding.AddBinding(Entity, e => e.AndroidLogin, w => w.Text).InitializeFromSource();
 			dataentryAndroidPassword.Binding.AddBinding(Entity, e => e.AndroidPassword, w => w.Text).InitializeFromSource();
 
-			var filterDefaultForwarder = new EmployeeFilterViewModel();
+			var filterDefaultForwarder = new OldEmployeeFilterViewModel();
 			filterDefaultForwarder.SetAndRefilterAtOnce(
 				x => x.Category = EmployeeCategory.forwarder,
 				x => x.Status = EmployeeStatus.IsWorking

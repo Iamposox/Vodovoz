@@ -57,7 +57,7 @@ namespace Vodovoz.Dialogs.Employees
 				UpdateStates();
 			};
 
-			var filterDefaultForwarder = new EmployeeFilterViewModel();
+			var filterDefaultForwarder = new OldEmployeeFilterViewModel();
 			filterDefaultForwarder.Status = EmployeeStatus.IsWorking;
 			filterDefaultForwarder.SetAndRefilterAtOnce(x => x.RestrictCategory = EmployeeCategory.driver);
 			yentryDriver.RepresentationModel = new EmployeesVM(filterDefaultForwarder);

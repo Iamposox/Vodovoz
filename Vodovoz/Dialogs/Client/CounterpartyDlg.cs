@@ -146,19 +146,19 @@ namespace Vodovoz
 			ySpecCmbCameFrom.Binding.AddBinding(Entity, f => f.CameFrom, w => w.SelectedItem).InitializeFromSource();
 			referenceDefaultExpense.SubjectType = typeof(ExpenseCategory);
 			referenceDefaultExpense.Binding.AddBinding(Entity, e => e.DefaultExpenseCategory, w => w.Subject).InitializeFromSource();
-			var filterAccountant = new EmployeeFilterViewModel();
+			var filterAccountant = new OldEmployeeFilterViewModel();
 			filterAccountant.SetAndRefilterAtOnce(
 				x => x.RestrictCategory = EmployeeCategory.office,
 				x => x.Status = EmployeeStatus.IsWorking
 			);
 			referenceAccountant.RepresentationModel = new EmployeesVM(filterAccountant);
-			var filterSalesManager = new EmployeeFilterViewModel();
+			var filterSalesManager = new OldEmployeeFilterViewModel();
 			filterSalesManager.SetAndRefilterAtOnce(
 				x => x.RestrictCategory = EmployeeCategory.office,
 				x => x.Status = EmployeeStatus.IsWorking
 			);
 			referenceSalesManager.RepresentationModel = new EmployeesVM(filterSalesManager);
-			var filterBottleManager = new EmployeeFilterViewModel();
+			var filterBottleManager = new OldEmployeeFilterViewModel();
 			filterBottleManager.SetAndRefilterAtOnce(
 				x => x.RestrictCategory = EmployeeCategory.office,
 				x => x.Status = EmployeeStatus.IsWorking

@@ -116,7 +116,7 @@ namespace Vodovoz
 			entityviewmodelentryCar.CompletionPopupSetWidth(false);
 			entityviewmodelentryCar.Sensitive = logisticanEditing;
 
-			var filterDriver = new EmployeeFilterViewModel();
+			var filterDriver = new OldEmployeeFilterViewModel();
 			filterDriver.SetAndRefilterAtOnce(
 				x => x.RestrictCategory = EmployeeCategory.driver,
 				x => x.Status = EmployeeStatus.IsWorking
@@ -124,7 +124,7 @@ namespace Vodovoz
 			referenceDriver.RepresentationModel = new EmployeesVM(filterDriver);
 			referenceDriver.Binding.AddBinding(Entity, rl => rl.Driver, widget => widget.Subject).InitializeFromSource();
 			referenceDriver.Sensitive = logisticanEditing;
-			var filterForwarder = new EmployeeFilterViewModel();
+			var filterForwarder = new OldEmployeeFilterViewModel();
 			filterForwarder.SetAndRefilterAtOnce(
 				x => x.RestrictCategory = EmployeeCategory.forwarder,
 				x => x.Status = EmployeeStatus.IsWorking

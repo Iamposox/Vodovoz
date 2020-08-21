@@ -143,12 +143,12 @@ namespace Vodovoz
 				accessfilteredsubdivisionselectorwidget.SelectIfPossible(Entity.RelatedToSubdivision);
 			}
 
-			var filterEmployee = new EmployeeFilterViewModel();
+			var filterEmployee = new OldEmployeeFilterViewModel();
 			filterEmployee.Status = EmployeeStatus.IsWorking;
 			yentryEmployee.RepresentationModel = new ViewModel.EmployeesVM(filterEmployee);
 			yentryEmployee.Binding.AddBinding(Entity, e => e.Accountable, w => w.Subject).InitializeFromSource();
 
-			var filterCasher = new EmployeeFilterViewModel();
+			var filterCasher = new OldEmployeeFilterViewModel();
 			filterCasher.Status = EmployeeStatus.IsWorking;
 			yentryCasher.RepresentationModel = new ViewModel.EmployeesVM(filterCasher);
 			yentryCasher.Binding.AddBinding(Entity, e => e.Casher, w => w.Subject).InitializeFromSource();

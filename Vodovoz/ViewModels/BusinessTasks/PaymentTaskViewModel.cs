@@ -15,6 +15,7 @@ using Vodovoz.Journals.JournalViewModels;
 using Vodovoz.Journals.JournalViewModels.Organization;
 using Vodovoz.FilterViewModels.Organization;
 using Vodovoz.JournalViewModels;
+using Vodovoz.ViewModels.Journals.Filters.Employees;
 
 namespace Vodovoz.ViewModels.BusinessTasks
 {

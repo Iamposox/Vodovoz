@@ -9,6 +9,7 @@ using Vodovoz.Domain.Employees;
 using Vodovoz.Filters.ViewModels;
 using Vodovoz.Journals.JournalViewModels;
 using Vodovoz.JournalViewModels;
+using Vodovoz.ViewModels.Journals.Filters.Employees;
 
 namespace Vodovoz.Filters.GtkViews
 {

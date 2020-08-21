@@ -27,6 +27,7 @@ using Vodovoz.Repository.Logistics;
 using Vodovoz.Services;
 using Vodovoz.Core.DataService;
 using Vodovoz.JournalViewModels;
+using Vodovoz.ViewModels.Journals.Filters.Employees;
 
 namespace Vodovoz.Dialogs.Logistic
 {

@@ -26,7 +26,7 @@ namespace Vodovoz.ReportsParameters.Bottles
 			daterangepicker.StartDate = DateTime.Now.AddDays(-7);
 			daterangepicker.EndDate = DateTime.Now.AddDays(1);
 			
-			var filter = new EmployeeFilterViewModel();
+			var filter = new OldEmployeeFilterViewModel();
 			filter.Status = EmployeeStatus.IsWorking;
 			filter.Category = EmployeeCategory.office;
 			yentryEmployer.RepresentationModel = new EmployeesVM(filter);

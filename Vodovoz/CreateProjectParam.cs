@@ -51,7 +51,6 @@ using Vodovoz.Domain.StoredResources;
 using Vodovoz.Filters.GtkViews;
 using Vodovoz.Filters.ViewModels;
 using Vodovoz.FilterViewModels;
-using Vodovoz.FilterViewModels.Employees;
 using Vodovoz.FilterViewModels.Goods;
 using Vodovoz.FilterViewModels.Organization;
 using Vodovoz.FilterViewModels.Suppliers;
@@ -99,6 +98,7 @@ using Vodovoz.ViewModels.Cash;
 using Vodovoz.ViewModels.Dialogs.Cash;
 using Vodovoz.Views.Cash;
 using Vodovoz.Views.Orders;
+using Vodovoz.ViewModels.Journals.Filters.Employees;
 
 namespace Vodovoz
 {

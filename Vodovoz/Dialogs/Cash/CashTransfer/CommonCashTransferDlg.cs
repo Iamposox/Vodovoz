@@ -47,7 +47,7 @@ namespace Vodovoz.Dialogs.Cash.CashTransfer
 			yspinMoney.Binding.AddBinding(ViewModel.Entity, e => e.TransferedSum, w => w.ValueAsDecimal).InitializeFromSource();
 			yspinMoney.Binding.AddBinding(ViewModel, e => e.CanEdit, w => w.Sensitive).InitializeFromSource();
 
-			var filterDriver = new EmployeeFilterViewModel();
+			var filterDriver = new OldEmployeeFilterViewModel();
 			filterDriver.SetAndRefilterAtOnce(
 				x => x.RestrictCategory = EmployeeCategory.driver,
 				x => x.Status = EmployeeStatus.IsWorking

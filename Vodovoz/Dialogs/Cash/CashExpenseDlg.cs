@@ -98,12 +98,12 @@ namespace Vodovoz
 			enumcomboOperation.ItemsEnum = typeof(ExpenseType);
 			enumcomboOperation.Binding.AddBinding (Entity, s => s.TypeOperation, w => w.SelectedItem).InitializeFromSource ();
 
-			var filterCasher = new EmployeeFilterViewModel();
+			var filterCasher = new OldEmployeeFilterViewModel();
 			filterCasher.Status = EmployeeStatus.IsWorking;
 			yentryCasher.RepresentationModel = new ViewModel.EmployeesVM(filterCasher);
 			yentryCasher.Binding.AddBinding(Entity, s => s.Casher, w => w.Subject).InitializeFromSource();
 
-			var filterEmployee = new EmployeeFilterViewModel();
+			var filterEmployee = new OldEmployeeFilterViewModel();
 			filterEmployee.Status = EmployeeStatus.IsWorking;
 			yentryEmployee.RepresentationModel = new ViewModel.EmployeesVM(filterEmployee);
 			yentryEmployee.Binding.AddBinding(Entity, s => s.Employee, w => w.Subject).InitializeFromSource();

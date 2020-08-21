@@ -1511,6 +1511,7 @@
     <Compile Include="Views\Cash\CashIncomeView.cs" />
     <Compile Include="gtk-gui\Vodovoz.Views.Cash.CashIncomeView.cs" />
     <Compile Include="TempAdapters\EntitySelectorFactory.cs" />
+    <Compile Include="JournalFilters\OldEmployeeFilterViewModel.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

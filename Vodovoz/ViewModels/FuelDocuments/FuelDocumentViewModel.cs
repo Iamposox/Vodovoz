@@ -109,7 +109,7 @@ namespace Vodovoz.ViewModels.FuelDocuments
 				if(employeeJournal != null)
 					return employeeJournal;
 
-				var filterDriver = new EmployeeFilterViewModel();
+				var filterDriver = new OldEmployeeFilterViewModel();
 				filterDriver.SetAndRefilterAtOnce(
 					x => x.RestrictCategory = EmployeeCategory.driver,
 					x => x.Status = EmployeeStatus.IsWorking

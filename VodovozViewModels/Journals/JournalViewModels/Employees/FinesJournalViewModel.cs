@@ -11,11 +11,11 @@ using QS.Project.Journal.EntitySelector;
 using QS.Services;
 using Vodovoz.Domain.Employees;
 using Vodovoz.Domain.Logistic;
-using Vodovoz.FilterViewModels.Employees;
 using Vodovoz.Infrastructure.Services;
 using Vodovoz.Journals.JournalNodes;
 using Vodovoz.TempAdapters;
 using Vodovoz.ViewModels.Employees;
+using Vodovoz.ViewModels.Journals.Filters.Employees;
 
 namespace Vodovoz.Journals.JournalViewModels.Employees
 {

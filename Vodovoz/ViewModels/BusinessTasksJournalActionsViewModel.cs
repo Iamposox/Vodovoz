@@ -11,6 +11,7 @@ using QS.Project.Services;
 using System.Linq;
 using QS.ViewModels;
 using Vodovoz.JournalViewModels;
+using Vodovoz.ViewModels.Journals.Filters.Employees;
 
 namespace Vodovoz.ViewModels
 {

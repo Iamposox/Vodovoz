@@ -13,8 +13,8 @@ namespace Vodovoz.ViewModel
 {
 	public class EmployeesVM : RepresentationModelEntityBase<Employee, EmployeesVMNode>
 	{
-		public EmployeeFilterViewModel Filter {
-			get => RepresentationFilter as EmployeeFilterViewModel;
+		public OldEmployeeFilterViewModel Filter {
+			get => RepresentationFilter as OldEmployeeFilterViewModel;
 			set => RepresentationFilter = value as IRepresentationFilter;
 		}
 
@@ -83,25 +83,25 @@ namespace Vodovoz.ViewModel
 
 		#endregion
 
-		public EmployeesVM(IUnitOfWork uow, EmployeeFilterViewModel filterViewModel)
+		public EmployeesVM(IUnitOfWork uow, OldEmployeeFilterViewModel filterViewModel)
 		{
 			Filter = filterViewModel;
 			UoW = uow;
 		}
 
-		public EmployeesVM(EmployeeFilterViewModel filterViewModel)
+		public EmployeesVM(OldEmployeeFilterViewModel filterViewModel)
 		{
 			Filter = filterViewModel;
 		}
 
 		public EmployeesVM()
 		{
-			CreateRepresentationFilter = () => new EmployeeFilterViewModel { Status = EmployeeStatus.IsWorking };
+			CreateRepresentationFilter = () => new OldEmployeeFilterViewModel { Status = EmployeeStatus.IsWorking };
 		}
 
 		public EmployeesVM(IUnitOfWork uow)
 		{
-			CreateRepresentationFilter = () => new EmployeeFilterViewModel { Status = EmployeeStatus.IsWorking };
+			CreateRepresentationFilter = () => new OldEmployeeFilterViewModel { Status = EmployeeStatus.IsWorking };
 			this.UoW = uow;
 		}
 	}

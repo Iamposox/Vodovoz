@@ -71,6 +71,7 @@ using Vodovoz.EntityRepositories;
 using Vodovoz.ViewModels.Users;
 using Vodovoz.ViewModels;
 using Vodovoz.JournalViewModels;
+using Vodovoz.ViewModels.Journals.Filters.Employees;
 
 public partial class MainWindow : Gtk.Window, IProgressBarDisplayable
 {

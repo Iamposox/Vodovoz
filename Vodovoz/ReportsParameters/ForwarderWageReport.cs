@@ -19,7 +19,7 @@ namespace Vodovoz.Reports
 			this.Build();
 			UoW = UnitOfWorkFactory.CreateWithoutRoot ();
 
-			var filterForwarder = new EmployeeFilterViewModel();
+			var filterForwarder = new OldEmployeeFilterViewModel();
 			filterForwarder.SetAndRefilterAtOnce(
 				x => x.RestrictCategory = EmployeeCategory.forwarder,
 				x => x.Status = EmployeeStatus.IsWorking

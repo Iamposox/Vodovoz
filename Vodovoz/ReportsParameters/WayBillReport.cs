@@ -11,6 +11,7 @@ using QS.Project.Services;
 using Vodovoz.Domain.Logistic;
 using QS.DomainModel.UoW;
 using Vodovoz.JournalViewModels;
+using Vodovoz.ViewModels.Journals.Filters.Employees;
 
 namespace Vodovoz.ReportsParameters
 {

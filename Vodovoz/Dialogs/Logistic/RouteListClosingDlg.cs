@@ -147,7 +147,7 @@ namespace Vodovoz
 			entityviewmodelentryCar.Binding.AddBinding(Entity, e => e.Car, w => w.Subject).InitializeFromSource();
 			entityviewmodelentryCar.CompletionPopupSetWidth(false);
 
-			var filterDriver = new EmployeeFilterViewModel();
+			var filterDriver = new OldEmployeeFilterViewModel();
 			filterDriver.SetAndRefilterAtOnce(
 				x => x.RestrictCategory = EmployeeCategory.driver,
 				x => x.Status = EmployeeStatus.IsWorking
@@ -156,7 +156,7 @@ namespace Vodovoz
 			referenceDriver.Binding.AddBinding(Entity, rl => rl.Driver, widget => widget.Subject).InitializeFromSource();
 
 			previousForwarder = Entity.Forwarder;
-			var filterForwarder = new EmployeeFilterViewModel();
+			var filterForwarder = new OldEmployeeFilterViewModel();
 			filterForwarder.SetAndRefilterAtOnce(
 				x => x.RestrictCategory = EmployeeCategory.forwarder,
 				x => x.Status = EmployeeStatus.IsWorking
@@ -165,7 +165,7 @@ namespace Vodovoz
 			referenceForwarder.Binding.AddBinding(Entity, rl => rl.Forwarder, widget => widget.Subject).InitializeFromSource();
 			referenceForwarder.Changed += ReferenceForwarder_Changed;
 
-			var filterLogistican = new EmployeeFilterViewModel();
+			var filterLogistican = new OldEmployeeFilterViewModel();
 			filterLogistican.SetAndRefilterAtOnce(x => x.Status = EmployeeStatus.IsWorking);
 			referenceLogistican.RepresentationModel = new EmployeesVM(filterLogistican);
 			referenceLogistican.Binding.AddBinding(Entity, rl => rl.Logistician, widget => widget.Subject).InitializeFromSource();

@@ -49,6 +49,7 @@ using Vodovoz.Tools;
 using Vodovoz.Tools.CallTasks;
 using Vodovoz.ViewModels.Journals.Cash;
 using Vodovoz.ViewWidgets;
+using Vodovoz.ViewModels.Journals.Filters.Employees;
 
 public partial class MainWindow : Window
 {
