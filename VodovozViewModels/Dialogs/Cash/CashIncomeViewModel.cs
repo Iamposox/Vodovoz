@@ -415,6 +415,28 @@ namespace Vodovoz.ViewModels.Dialogs.Cash
 			}
 		}
 
+		public bool TryFillReturnForAdvance(Expense advance)
+		{
+			if(advance.Employee == null) {
+				logger.Error("Аванс без сотрудника. Для него нельзя открыть диалог возврата.");
+				interactiveService.ShowMessage(
+					ImportanceLevel.Warning,
+					"Невозможно заполнить возврат. Так как в авансе не указан сотрудник",
+					"Заполнение возврата по авансу"
+				);
+				return false;
+			}
+
+			TypeOperation = IncomeType.Return;
+			Entity.ExpenseCategory = advance.ExpenseCategory;
+			Entity.Employee = advance.Employee;
+			var foundDebt = Entity.Debts.FirstOrDefault(x => x.Value.Id == advance.Id);
+			if(foundDebt != null) {
+				foundDebt.Selected = true;
+			}
+			return true;
+		}
+
 		#endregion Debts return
 
 	}
