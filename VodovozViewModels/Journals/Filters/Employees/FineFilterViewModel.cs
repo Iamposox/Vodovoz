@@ -1,8 +1,7 @@
 ﻿using System;
 using QS.Project.Filter;
-using QS.Services;
 
-namespace Vodovoz.FilterViewModels.Employees
+namespace Vodovoz.ViewModels.Journals.Filters.Employees
 {
 	public class FineFilterViewModel : FilterViewModelBase<FineFilterViewModel>
 	{

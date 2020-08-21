@@ -1,21 +1,17 @@
 ﻿using System;
 using QS.DomainModel.Entity;
-using QS.Services;
 using Vodovoz.Domain.Employees;
 using Vodovoz.Domain.WageCalculation;
+using QS.Project.Filter;
 
-namespace Vodovoz.Filters.ViewModels
+namespace Vodovoz.ViewModels.Journals.Filters.Employees
 {
-	public class EmployeeFilterViewModel : RepresentationFilterViewModelBase<EmployeeFilterViewModel>
+	public class EmployeeFilterViewModel : FilterViewModelBase<EmployeeFilterViewModel>
 	{
 		private EmployeeCategory? category;
 		public virtual EmployeeCategory? Category {
 			get => category;
-			set {
-				if(SetField(ref category, value, () => Category)) {
-					Update();
-				}
-			}
+			set => UpdateFilterField(ref category, value);
 		}
 
 		private EmployeeCategory? restrictCategory;
@@ -23,7 +19,7 @@ namespace Vodovoz.Filters.ViewModels
 		public virtual EmployeeCategory? RestrictCategory {
 			get => restrictCategory;
 			set {
-				if(SetField(ref restrictCategory, value, () => RestrictCategory)) {
+				if(SetField(ref restrictCategory, value)) {
 					Category = RestrictCategory;
 					Update();
 				}
@@ -35,40 +31,31 @@ namespace Vodovoz.Filters.ViewModels
 		EmployeeStatus? status;
 		public virtual EmployeeStatus? Status {
 			get => status;
-			set => UpdateFilterField(ref status, value, () => Status);
+			set => UpdateFilterField(ref status, value);
 		}
 
 		private bool canChangeStatus = true;
 		public bool CanChangeStatus {
 			get => canChangeStatus; 
-			set => UpdateFilterField(ref canChangeStatus, value, () => CanChangeStatus); 
+			set => UpdateFilterField(ref canChangeStatus, value); 
 		}
 
 		private DateTime? weekDay;
 		public virtual DateTime? WeekDay {
 			get => weekDay;
-			set {
-				if(SetField(ref weekDay, value))
-					Update();
-			}
+			set => UpdateFilterField(ref weekDay, value);
 		}
 
 		private TimeSpan? drvStartTime;
 		public virtual TimeSpan? DrvStartTime {
 			get => drvStartTime;
-			set {
-				if(SetField(ref drvStartTime, value))
-					Update();
-			}
+			set => UpdateFilterField(ref drvStartTime, value);
 		}
 
 		private TimeSpan? drvEndTime;
 		public virtual TimeSpan? DrvEndTime {
 			get => drvEndTime;
-			set {
-				if(SetField(ref drvEndTime, value))
-					Update();
-			}
+			set => UpdateFilterField(ref drvEndTime, value);
 		}
 
 		WageParameterItemTypes? restrictWageParameterItemType;
