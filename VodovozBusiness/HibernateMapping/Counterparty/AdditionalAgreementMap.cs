@@ -63,13 +63,4 @@
 			HasMany(x => x.FixedPrices).KeyColumn("agreement_id").Inverse().Cascade.AllDeleteOrphan().LazyLoad();
 		}
 	}
-
-	public class EquipmentSalesAgreementMap : SubclassMap<SalesEquipmentAgreement>
-	{
-		public EquipmentSalesAgreementMap()
-		{
-			DiscriminatorValue("EquipmentSales");
-			HasMany(x => x.SalesEqipments).KeyColumn("additional_agreement_id").Inverse().Cascade.AllDeleteOrphan().LazyLoad();
-		}
-	}
 }

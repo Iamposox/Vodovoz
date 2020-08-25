@@ -131,8 +131,6 @@ namespace Vodovoz.Domain.Client
 					return new ContractParser();
 				case TemplateType.AgWater:
 					return new WaterAgreementParser();
-				case TemplateType.AgEquip:
-					return new EquipmentAgreementParser();
 				case TemplateType.AgLongRent:
 					return new NonFreeRentAgreementParser();
 				case TemplateType.AgFreeRent:
@@ -159,8 +157,6 @@ namespace Vodovoz.Domain.Client
 		Contract,
 		[Display (Name = "Доп. соглашение на воду")]
 		AgWater,
-		[Display (Name = "Доп. соглашение на продажу оборудования")]
-		AgEquip,
 		[Display (Name = "Доп. соглашение бесплатной аренды")]
 		AgFreeRent,
 		[Display (Name = "Доп. соглашение короткосрочной аренды")]
