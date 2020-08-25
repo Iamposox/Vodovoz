@@ -72,12 +72,4 @@
 			HasMany(x => x.SalesEqipments).KeyColumn("additional_agreement_id").Inverse().Cascade.AllDeleteOrphan().LazyLoad();
 		}
 	}
-
-	public class RepairAgreementMap : SubclassMap<RepairAgreement>
-	{
-		public RepairAgreementMap()
-		{
-			DiscriminatorValue ("Repair");
-		}
-	}
 }

@@ -59,8 +59,6 @@ namespace Vodovoz.Domain.Orders.Documents
 						var equipmentAgreementParser = (AdditionalAgreement.DocumentTemplate.DocParser as EquipmentAgreementParser);
 						equipmentAgreementParser.AddPricesTable((AdditionalAgreement.Self as SalesEquipmentAgreement).SalesEqipments.ToList());
 						break;
-					case AgreementType.Repair:
-						break;
 					default:
 						break;
 				}

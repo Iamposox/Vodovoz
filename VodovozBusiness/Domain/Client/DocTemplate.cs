@@ -139,8 +139,6 @@ namespace Vodovoz.Domain.Client
 					return new FreeRentAgreementParser();
 				case TemplateType.AgShortRent:
 					return new DailyRentAgreementParser();
-				case TemplateType.AgRepair:
-					return new RepairAgreementParser();
 				case TemplateType.CarProxy:
 					return new CarProxyDocumentParser();
 				case TemplateType.M2Proxy:
@@ -169,8 +167,6 @@ namespace Vodovoz.Domain.Client
 		AgShortRent,
 		[Display (Name = "Доп. соглашение долгосрочной аренды")]
 		AgLongRent,
-		[Display (Name = "Доп. соглашение на обслуживание")]
-		AgRepair,
 		[Display (Name = "Доверенность на ТС")]
 		CarProxy,
 		[Display(Name = "Доверенность М-2")]

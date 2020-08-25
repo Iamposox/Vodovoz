@@ -68,7 +68,6 @@ namespace Vodovoz.Domain.Client
 					return AgreementType.WaterSales;
 				if(this is SalesEquipmentAgreement)
 					return AgreementType.EquipmentSales;
-				return AgreementType.Repair;
 			}		
 		}
 
@@ -183,8 +182,6 @@ namespace Vodovoz.Domain.Client
 					return "АМ";
 				case AgreementType.FreeRent:
 					return "Б";
-				case AgreementType.Repair:
-					return "Т";
 				case AgreementType.WaterSales:
 					return "В";
 				case AgreementType.EquipmentSales:
@@ -205,8 +202,6 @@ namespace Vodovoz.Domain.Client
 					return TemplateType.AgLongRent;
 				case AgreementType.FreeRent:
 					return TemplateType.AgFreeRent;
-				case AgreementType.Repair:
-					return TemplateType.AgRepair;
 				case AgreementType.WaterSales:
 					return TemplateType.AgWater;
 				case AgreementType.EquipmentSales:
@@ -245,9 +240,7 @@ namespace Vodovoz.Domain.Client
 		[Display (Name = "Продажа воды")]
 		WaterSales,
 		[Display (Name = "Продажа оборудования")]
-		EquipmentSales,
-		[Display (Name = "Ремонт")]
-		Repair
+		EquipmentSales
 	}
 
 	public class AgreementTypeStringType : NHibernate.Type.EnumStringType

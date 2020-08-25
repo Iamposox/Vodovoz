@@ -109,7 +109,6 @@
     <Compile Include="Domain\Client\NonfreeRentAgreement.cs" />
     <Compile Include="Domain\Client\PaidRentEquipment.cs" />
     <Compile Include="Domain\Client\Proxy.cs" />
-    <Compile Include="Domain\Client\RepairAgreement.cs" />
     <Compile Include="Domain\Client\WaterSalesAgreement.cs" />
     <Compile Include="Domain\CommentTemplate.cs" />
     <Compile Include="Domain\CommonEnums.cs" />
@@ -314,7 +313,6 @@
     <Compile Include="DocTemplates\NonFreeRentAgreementParser.cs" />
     <Compile Include="DocTemplates\FreeRentAgreementParser.cs" />
     <Compile Include="DocTemplates\DailyRentAgreementParser.cs" />
-    <Compile Include="DocTemplates\RepairAgreementParser.cs" />
     <Compile Include="Domain\Client\WaterSalesAgreementFixedPrice.cs" />
     <Compile Include="HibernateMapping\Counterparty\WaterSalesAgreementFixedPriceMap.cs" />
     <Compile Include="HibernateMapping\Operations\FuelOperationMap.cs" />
