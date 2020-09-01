@@ -49,7 +49,6 @@ namespace Vodovoz.Domain.Client
 		byte[] changedTemplateFile;
 
 		[Display (Name = "Измененное соглашение")]
-		//[PropertyChangedAlso("FileSize")]
 		public virtual byte[] ChangedTemplateFile {
 			get => changedTemplateFile;
 			set => SetField(ref changedTemplateFile, value, () => ChangedTemplateFile);
@@ -58,8 +57,6 @@ namespace Vodovoz.Domain.Client
 		[Display (Name = "Тип доп. соглашения")]
 		public virtual AgreementType Type {
 			get {
-				if (this is NonfreeRentAgreement)
-					return AgreementType.NonfreeRent;
 				if (this is WaterSalesAgreement)
 					return AgreementType.WaterSales;
 				throw new NotImplementedException();
@@ -171,8 +168,6 @@ namespace Vodovoz.Domain.Client
 		{
 			switch (type)
 			{
-				case AgreementType.NonfreeRent:
-					return "АМ";
 				case AgreementType.WaterSales:
 					return "В";
 				default:
@@ -185,8 +180,6 @@ namespace Vodovoz.Domain.Client
 		{
 			switch (type)
 			{
-				case AgreementType.NonfreeRent:
-					return TemplateType.AgLongRent;
 				case AgreementType.WaterSales:
 					return TemplateType.AgWater;
 				default:
@@ -195,24 +188,10 @@ namespace Vodovoz.Domain.Client
 		}
 
 		#endregion
-
-		/// <summary>
-		/// Возвращает типы доп соглашений которые создаются на 
-		/// каждое новое создание аренды в заказе, и могут хранится 
-		/// в неограниченном количестве в договоре
-		/// </summary>
-		public static AgreementType[] GetOrderBasedAgreementTypes()
-		{
-			return new AgreementType[] {
-				AgreementType.NonfreeRent
-			};
-		}
 	}
 
 	public enum AgreementType
 	{
-		[Display (Name = "Долгосрочная аренда")]
-		NonfreeRent,
 		[Display (Name = "Продажа воды")]
 		WaterSales,
 	}
@@ -222,14 +201,6 @@ namespace Vodovoz.Domain.Client
 		public AgreementTypeStringType () : base (typeof(AgreementType))
 		{
 		}
-	}
-
-	public enum OrderAgreementType
-	{
-		[Display (Name = "Долгосрочная аренда")]
-		NonfreeRent,
-		[Display (Name = "Бесплатная аренда")]
-		FreeRent
 	}
 
 	public interface IAgreementSaved
