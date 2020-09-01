@@ -135,8 +135,6 @@ namespace Vodovoz.Domain.Client
 					return new NonFreeRentAgreementParser();
 				case TemplateType.AgFreeRent:
 					return new FreeRentAgreementParser();
-				case TemplateType.AgShortRent:
-					return new DailyRentAgreementParser();
 				case TemplateType.CarProxy:
 					return new CarProxyDocumentParser();
 				case TemplateType.M2Proxy:

@@ -34,17 +34,6 @@
 		}
 	}
 
-	public class DailyRentAgreementMap : SubclassMap<DailyRentAgreement>
-	{
-		public DailyRentAgreementMap ()
-		{
-			DiscriminatorValue ("DailyRent");
-			Map(x => x.RentDays).Column("rent_days");
-			HasMany (x => x.Equipment).Cascade.AllDeleteOrphan ().LazyLoad ()
-				.KeyColumn ("additional_agreement_id");
-		}
-	}
-
 	public class FreeRentAgreementMap : SubclassMap<FreeRentAgreement>
 	{
 		public FreeRentAgreementMap()

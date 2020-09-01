@@ -101,7 +101,6 @@
     <Compile Include="Domain\Client\Contact.cs" />
     <Compile Include="Domain\Client\Counterparty.cs" />
     <Compile Include="Domain\Client\CounterpartyContract.cs" />
-    <Compile Include="Domain\Client\DailyRentAgreement.cs" />
     <Compile Include="Domain\Client\DeliveryPoint.cs" />
     <Compile Include="Domain\Client\DocTemplate.cs" />
     <Compile Include="Domain\Client\FreeRentAgreement.cs" />
@@ -312,7 +311,6 @@
     <Compile Include="DocTemplates\WaterAgreementParser.cs" />
     <Compile Include="DocTemplates\NonFreeRentAgreementParser.cs" />
     <Compile Include="DocTemplates\FreeRentAgreementParser.cs" />
-    <Compile Include="DocTemplates\DailyRentAgreementParser.cs" />
     <Compile Include="Domain\Client\WaterSalesAgreementFixedPrice.cs" />
     <Compile Include="HibernateMapping\Counterparty\WaterSalesAgreementFixedPriceMap.cs" />
     <Compile Include="HibernateMapping\Operations\FuelOperationMap.cs" />

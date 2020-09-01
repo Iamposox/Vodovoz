@@ -57,15 +57,14 @@ namespace Vodovoz.Domain.Client
 
 		[Display (Name = "Тип доп. соглашения")]
 		public virtual AgreementType Type {
-			get {	 
-				if (this is DailyRentAgreement)
-					return AgreementType.DailyRent;
+			get {
 				if (this is NonfreeRentAgreement)
 					return AgreementType.NonfreeRent;
 				if (this is FreeRentAgreement)
 					return AgreementType.FreeRent;
 				if (this is WaterSalesAgreement)
 					return AgreementType.WaterSales;
+				throw new NotImplementedException();
 			}		
 		}
 
@@ -174,8 +173,6 @@ namespace Vodovoz.Domain.Client
 		{
 			switch (type)
 			{
-				case AgreementType.DailyRent:
-					return "АС";
 				case AgreementType.NonfreeRent:
 					return "АМ";
 				case AgreementType.FreeRent:
@@ -192,8 +189,6 @@ namespace Vodovoz.Domain.Client
 		{
 			switch (type)
 			{
-				case AgreementType.DailyRent:
-					return TemplateType.AgShortRent;
 				case AgreementType.NonfreeRent:
 					return TemplateType.AgLongRent;
 				case AgreementType.FreeRent:
@@ -215,7 +210,6 @@ namespace Vodovoz.Domain.Client
 		public static AgreementType[] GetOrderBasedAgreementTypes()
 		{
 			return new AgreementType[] {
-				AgreementType.DailyRent,
 				AgreementType.FreeRent,
 				AgreementType.NonfreeRent
 			};
@@ -226,8 +220,6 @@ namespace Vodovoz.Domain.Client
 	{
 		[Display (Name = "Долгосрочная аренда")]
 		NonfreeRent,
-		[Display (Name = "Посуточная аренда")]
-		DailyRent,
 		[Display (Name = "Бесплатная аренда")]
 		FreeRent,
 		[Display (Name = "Продажа воды")]
@@ -245,8 +237,6 @@ namespace Vodovoz.Domain.Client
 	{
 		[Display (Name = "Долгосрочная аренда")]
 		NonfreeRent,
-		[Display (Name = "Посуточная аренда")]
-		DailyRent,
 		[Display (Name = "Бесплатная аренда")]
 		FreeRent
 	}
