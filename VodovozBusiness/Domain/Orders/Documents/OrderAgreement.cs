@@ -44,8 +44,6 @@ namespace Vodovoz.Domain.Orders.Documents
 						nonFreeRentAgreementParser.AddTableNomenclatures((AdditionalAgreement.Self as NonfreeRentAgreement).PaidRentEquipments.ToList());
 						nonFreeRentAgreementParser.AddTableEquipmentTypes((AdditionalAgreement.Self as NonfreeRentAgreement).PaidRentEquipments.ToList());
 						break;
-					case AgreementType.FreeRent:
-						break;
 					case AgreementType.WaterSales:
 						var waterAgreementParser = (AdditionalAgreement.DocumentTemplate.DocParser as WaterAgreementParser);
 						waterAgreementParser.AddPricesTable(WaterPricesRepository.GetCompleteWaterPriceTable(uow));

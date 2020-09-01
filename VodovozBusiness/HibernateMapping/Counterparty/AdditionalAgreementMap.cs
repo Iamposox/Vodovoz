@@ -34,16 +34,6 @@
 		}
 	}
 
-	public class FreeRentAgreementMap : SubclassMap<FreeRentAgreement>
-	{
-		public FreeRentAgreementMap()
-		{
-			DiscriminatorValue ("FreeRent");
-			HasMany (x => x.Equipment).Cascade.AllDeleteOrphan ().LazyLoad ()
-				.KeyColumn ("additional_agreement_id");
-		}
-	}
-
 	public class WaterSalesAgreementMap : SubclassMap<WaterSalesAgreement>
 	{
 		public WaterSalesAgreementMap()

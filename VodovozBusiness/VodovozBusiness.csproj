@@ -103,8 +103,6 @@
     <Compile Include="Domain\Client\CounterpartyContract.cs" />
     <Compile Include="Domain\Client\DeliveryPoint.cs" />
     <Compile Include="Domain\Client\DocTemplate.cs" />
-    <Compile Include="Domain\Client\FreeRentAgreement.cs" />
-    <Compile Include="Domain\Client\FreeRentEquipment.cs" />
     <Compile Include="Domain\Client\NonfreeRentAgreement.cs" />
     <Compile Include="Domain\Client\PaidRentEquipment.cs" />
     <Compile Include="Domain\Client\Proxy.cs" />
@@ -199,7 +197,6 @@
     <Compile Include="HibernateMapping\Counterparty\CounterpartyMap.cs" />
     <Compile Include="HibernateMapping\Counterparty\DeliveryPointMap.cs" />
     <Compile Include="HibernateMapping\Counterparty\DocTemplateMap.cs" />
-    <Compile Include="HibernateMapping\Counterparty\FreeRentEquipmentMap.cs" />
     <Compile Include="HibernateMapping\Counterparty\PaidRentEquipmentMap.cs" />
     <Compile Include="HibernateMapping\Counterparty\ProxyMap.cs" />
     <Compile Include="HibernateMapping\Documents\CarLoadDocumentItemMap.cs" />
@@ -310,7 +307,6 @@
     <Compile Include="Repositories\Client\DocTemplateRepository.cs" />
     <Compile Include="DocTemplates\WaterAgreementParser.cs" />
     <Compile Include="DocTemplates\NonFreeRentAgreementParser.cs" />
-    <Compile Include="DocTemplates\FreeRentAgreementParser.cs" />
     <Compile Include="Domain\Client\WaterSalesAgreementFixedPrice.cs" />
     <Compile Include="HibernateMapping\Counterparty\WaterSalesAgreementFixedPriceMap.cs" />
     <Compile Include="HibernateMapping\Operations\FuelOperationMap.cs" />
