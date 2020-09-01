@@ -239,13 +239,6 @@ namespace Vodovoz.Domain.Orders
 			set => SetField(ref counterpartyMovementOperation, value, () => CounterpartyMovementOperation);
 		}
 
-		PaidRentEquipment paidRentEquipment;
-
-		public virtual PaidRentEquipment PaidRentEquipment {
-			get => paidRentEquipment;
-			set => SetField(ref paidRentEquipment, value, () => PaidRentEquipment);
-		}
-
 		PromotionalSet promoSet;
 		[Display(Name = "Добавлено из промо-набора")]
 		public virtual PromotionalSet PromoSet {
@@ -262,9 +255,6 @@ namespace Vodovoz.Domain.Orders
 		/// </summary>
 		int RentEquipmentCount {
 			get {
-				if(AdditionalAgreement?.Type == AgreementType.NonfreeRent && PaidRentEquipment != null)
-					return PaidRentEquipment.Count;
-
 				return 0;
 			}
 		}
@@ -280,12 +270,6 @@ namespace Vodovoz.Domain.Orders
 			get {
 				if(AdditionalAgreement == null) {
 					return 0;
-				}
-				if(AdditionalAgreement.Self is NonfreeRentAgreement) {
-					NonfreeRentAgreement nonFreeRent = AdditionalAgreement.Self as NonfreeRentAgreement;
-					if(nonFreeRent.RentMonths.HasValue) {
-						return nonFreeRent.RentMonths.Value;
-					}
 				}
 
 				return 0;
@@ -551,23 +535,6 @@ namespace Vodovoz.Domain.Orders
 			}
 
 			return CounterpartyMovementOperation;
-		}
-
-		public virtual void DeleteAdditionalAgreement(IUnitOfWork uow)
-		{
-			uow.Delete(this.AdditionalAgreement);
-			this.AdditionalAgreement = null;
-			uow.Save();
-		}
-
-		public virtual void DeletePaidRentEquipment(IUnitOfWork uow)
-		{
-			if(this.AdditionalAgreement is NonfreeRentAgreement)
-				((NonfreeRentAgreement)this.AdditionalAgreement).RemoveEquipment(this.PaidRentEquipment);
-
-			uow.Delete(this.PaidRentEquipment);
-			this.PaidRentEquipment = null;
-			uow.Save();
 		}
 
 		#endregion
