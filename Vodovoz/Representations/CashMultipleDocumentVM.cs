@@ -7,8 +7,12 @@ using NHibernate;
 using NHibernate.Criterion;
 using NHibernate.Transform;
 using QS.DomainModel.Entity;
+using QS.DomainModel.Entity.EntityPermissions.EntityExtendedPermission;
+using QS.DomainModel.NotifyChange;
 using QS.DomainModel.UoW;
 using QS.Permissions;
+using QS.Project.Domain;
+using QS.Project.Services;
 using QS.RepresentationModel.GtkUI;
 using QS.Utilities.Text;
 using QSProjectsLib;
@@ -16,7 +20,16 @@ using Vodovoz.Core.Journal;
 using Vodovoz.Dialogs.Cash;
 using Vodovoz.Domain.Cash;
 using Vodovoz.Domain.Employees;
+using Vodovoz.Domain.Service.BaseParametersServices;
+using Vodovoz.EntityRepositories.Cash;
+using Vodovoz.EntityRepositories.Employees;
+using Vodovoz.Parameters;
+using Vodovoz.PermissionExtensions;
 using Vodovoz.Repository.Cash;
+using Vodovoz.ServicesImplementations;
+using Vodovoz.TempAdapters;
+using Vodovoz.ViewModels.Dialogs.Cash;
+using Vodovoz.ViewWidgets;
 
 namespace Vodovoz.Representations
 {
@@ -36,7 +49,7 @@ namespace Vodovoz.Representations
 			Filter.UoW = UoW;
 			JournalFilter = Filter;
 
-			RegisterIncome();
+			//RegisterIncome();
 			RegisterExpense();
 			RegisterAdvanceReport();
 
@@ -78,7 +91,7 @@ namespace Vodovoz.Representations
 			decimal totalCash = 0;
 			string allCashString = "";
 			foreach(var item in Filter.SelectedSubdivisions) {
-				var currentSubdivisionCash = CashRepository.CurrentCashForSubdivision(UoW, item);
+				var currentSubdivisionCash = Repository.Cash.CashRepository.CurrentCashForSubdivision(UoW, item);
 				totalCash += currentSubdivisionCash;
 				allCashString += $"{item.Name}: {CurrencyWorks.GetShortCurrencyString(currentSubdivisionCash)} ";
 			}
@@ -89,6 +102,7 @@ namespace Vodovoz.Representations
 
 		public override string GetSummaryInfo() => $"{GetAllCashSummaryInfo()} Сумма выбранных документов: {GetTotalSumInfo()}. {base.GetSummaryInfo()}";
 
+		/*
 		private void RegisterIncome()
 		{
 			var incomeConfig = RegisterEntity<Income>();
@@ -165,7 +179,7 @@ namespace Vodovoz.Representations
 				return new List<CashDocumentVMNode>();
 			});
 
-			incomeConfig.AddDocumentConfiguration<CashIncomeDlg>(
+			incomeConfig.AddDocumentConfiguration<CashIncomeViewModel>(
 				//функция идентификации документа 
 				(CashDocumentVMNode node) => {
 					return node.DocTypeEnum == CashDocumentType.Income
@@ -174,9 +188,33 @@ namespace Vodovoz.Representations
 				//заголовок действия для создания нового документа
 				CashDocumentType.Income.GetEnumTitle(),
 				//функция диалога создания документа
-				() => new CashIncomeDlg(PermissionsSettings.PermissionService),
+				() => new CashIncomeViewModel(
+					EntityUoWBuilder.ForCreate(),
+					UnitOfWorkFactory.GetDefaultFactory,
+					VodovozGtkServicesConfig.EmployeeService,
+					new EntityExtendedPermissionValidator(PermissionExtensionSingletonStore.GetInstance(), EmployeeSingletonRepository.GetInstance()),
+					new GtkReportViewOpener(),
+					ServicesConfig.CommonServices,
+					NotifyConfiguration.Instance,
+					new CashCategoryRepository(new CashCategoryParametersProvider(new ParametersProvider())),
+					new EmployeeJournalFactory(),
+					new CounterpartyJournalFactory(),
+					new AvailableCashSubdivisionProvider()
+				),
 				//функция диалога открытия документа
-				(CashDocumentVMNode node) => new CashIncomeDlg(node.DocumentId, PermissionsSettings.PermissionService)
+				(CashDocumentVMNode node) => new CashIncomeViewModel(
+					EntityUoWBuilder.ForOpen(node.DocumentId),
+					UnitOfWorkFactory.GetDefaultFactory,
+					VodovozGtkServicesConfig.EmployeeService,
+					new EntityExtendedPermissionValidator(PermissionExtensionSingletonStore.GetInstance(), EmployeeSingletonRepository.GetInstance()),
+					new GtkReportViewOpener(),
+					ServicesConfig.CommonServices,
+					NotifyConfiguration.Instance,
+					new CashCategoryRepository(new CashCategoryParametersProvider(new ParametersProvider())),
+					new EmployeeJournalFactory(),
+					new CounterpartyJournalFactory(),
+					new AvailableCashSubdivisionProvider()
+				)
 			);
 
 			incomeConfig.AddDocumentConfigurationWithoutCreation<TransferIncomeDlg>(
@@ -200,7 +238,7 @@ namespace Vodovoz.Representations
 
 			//завершение конфигурации
 			incomeConfig.FinishConfiguration();
-		}
+		}*/
 
 		private void RegisterExpense()
 		{

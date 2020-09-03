@@ -3,6 +3,19 @@ using QS.DomainModel.UoW;
 using QS.Permissions;
 using Vodovoz.Domain.Cash;
 using Vodovoz.Domain.Employees;
+using Vodovoz.ViewModels.Dialogs.Cash;
+using QS.Project.Domain;
+using QS.DomainModel.Entity.EntityPermissions.EntityExtendedPermission;
+using Vodovoz.PermissionExtensions;
+using Vodovoz.EntityRepositories.Employees;
+using QS.DomainModel.NotifyChange;
+using QS.Project.Services;
+using Vodovoz.ViewWidgets;
+using Vodovoz.EntityRepositories.Cash;
+using Vodovoz.Domain.Service.BaseParametersServices;
+using Vodovoz.Parameters;
+using Vodovoz.TempAdapters;
+using Vodovoz.ServicesImplementations;
 
 namespace Vodovoz
 {
@@ -63,8 +76,22 @@ namespace Vodovoz
 		{
 			var expense = UoW.GetById<Expense> (representationUnclosed.GetSelectedId ());
 
-			var dlg = new CashIncomeDlg (expense, PermissionsSettings.PermissionService);
-			OpenNewTab (dlg);
+			var cashIncomeViewModel = new CashIncomeViewModel(
+				EntityUoWBuilder.ForCreate(),
+				UnitOfWorkFactory.GetDefaultFactory,
+				VodovozGtkServicesConfig.EmployeeService,
+				new EntityExtendedPermissionValidator(PermissionExtensionSingletonStore.GetInstance(), EmployeeSingletonRepository.GetInstance()),
+				new GtkReportViewOpener(),
+				ServicesConfig.CommonServices,
+				NotifyConfiguration.Instance,
+				new CashCategoryRepository(new CashCategoryParametersProvider(new ParametersProvider())),
+				new EmployeeJournalFactory(),
+				new CounterpartyJournalFactory(),
+				new AvailableCashSubdivisionProvider()
+			);
+			if(cashIncomeViewModel.TryFillReturnForAdvance(expense)) {
+				OpenNewTab(cashIncomeViewModel);
+			}
 		}
 
 		protected void OnButtonCloseClicked(object sender, EventArgs e)

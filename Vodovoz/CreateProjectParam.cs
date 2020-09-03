@@ -304,7 +304,7 @@ namespace Vodovoz
 				//Касса
 				OrmObjectMapping<IncomeCategory>.Create ().Dialog<CashIncomeCategoryDlg>().DefaultTableView ().Column("Код", x => x.Id.ToString()).Column ("Название", e => e.Name).Column ("Тип документа", e => e.IncomeDocumentType.GetEnumTitle()).End (),
 				OrmObjectMapping<ExpenseCategory>.Create ().Dialog<CashExpenseCategoryDlg>().DefaultTableView ().Column("Код", x => x.Id.ToString()).SearchColumn ("Название", e => e.Name).Column ("Тип документа", e => e.ExpenseDocumentType.GetEnumTitle()).TreeConfig(new RecursiveTreeConfig<ExpenseCategory>(x => x.Parent, x => x.Childs)).End (),
-				OrmObjectMapping<Income>.Create ().Dialog<CashIncomeDlg> (),
+				OrmObjectMapping<Income>.Create (),
 				OrmObjectMapping<Expense>.Create ().Dialog<CashExpenseDlg> (),
 				OrmObjectMapping<AdvanceReport>.Create ().Dialog<AdvanceReportDlg> (),
 				OrmObjectMapping<Fine>.Create ().Dialog<FineDlg> (),

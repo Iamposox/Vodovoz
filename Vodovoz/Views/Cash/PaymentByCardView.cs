@@ -18,12 +18,12 @@ namespace Vodovoz.Views.Cash
 			ybuttonSave.Binding.AddFuncBinding(ViewModel.Entity, e => e.OnlineOrder.HasValue, w => w.Sensitive).InitializeFromSource();
 			ybuttonSave.Clicked += (s, ea) => ViewModel.SaveAndClose();
 			
-			entryOnlineOrder.ValidationMode = ValidationType.numeric;
-			entryOnlineOrder.Binding.AddBinding(ViewModel.Entity, e => e.OnlineOrder, w => w.Text, new IntToStringConverter()).InitializeFromSource();
+			//entryOnlineOrder.ValidationMode = ValidationType.numeric;
+			//entryOnlineOrder.Binding.AddBinding(ViewModel.Entity, e => e.OnlineOrder, w => w.Text, new IntToStringConverter()).InitializeFromSource();
 			
-			comboPaymentFrom.SetRenderTextFunc<PaymentFrom>(x => x.Name);
-			comboPaymentFrom.Binding.AddBinding(ViewModel.Entity, vm => vm.PaymentByCardFrom, w => w.SelectedItem).InitializeFromSource();
-			comboPaymentFrom.ItemsList = ViewModel.UoW.GetAll<PaymentFrom>();
+			//comboPaymentFrom.SetRenderTextFunc<PaymentFrom>(x => x.Name);
+			//comboPaymentFrom.Binding.AddBinding(ViewModel.Entity, vm => vm.PaymentByCardFrom, w => w.SelectedItem).InitializeFromSource();
+			//comboPaymentFrom.ItemsList = ViewModel.UoW.GetAll<PaymentFrom>();
 		}
 	}
 }
