@@ -73,8 +73,6 @@ namespace Vodovoz.Domain.Orders.Documents
 
 	public enum OrderDocumentType
 	{
-		[Display(Name = "Доп. соглашение для заказа")]
-		AdditionalAgreement,
 		[Display(Name = "Договор для заказа")]
 		Contract,
 		[Display(Name = "Доверенность М-2 для заказа")]

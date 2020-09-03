@@ -71,7 +71,7 @@ namespace Vodovoz.HibernateMapping
 			DiscriminatorValue ("CoolerWarranty");
 			Map(x => x.WarrantyNumber).Column("warranty_number");
 			References(x => x.Contract).Column("contract_id");
-			References(x => x.AdditionalAgreement).Column("agreement_id");
+			References(x => x.AdditionalAgreementId).Column("agreement_id");
 		}
 	}
 

@@ -19,7 +19,7 @@ namespace Vodovoz.Domain.Orders.Documents
 				Identifier = "Documents.CoolerWarranty",
 				Parameters = new Dictionary<string, object> {
 					{ "order_id", Order.Id },
-					{ "agreement_id",  AdditionalAgreement?.Id != null ? AdditionalAgreement.Id : -1 },
+					{ "agreement_id",  AdditionalAgreementId },
 					{ "warranty_full_number", WarrantyFullNumber },
 					{ "organization_id", new BaseParametersProvider().GetCashlessOrganisationId }
 				}
@@ -47,15 +47,15 @@ namespace Vodovoz.Domain.Orders.Documents
 		[Display(Name = "Договор")]
 		public virtual CounterpartyContract Contract {
 			get => contract;
-			set => SetField(ref contract, value, () => Contract);
+			set => SetField(ref contract, value);
 		}
 
-		AdditionalAgreement additionalAgreement;
+		int additionalAgreementId;
 
 		[Display(Name = "Доп. соглашение")]
-		public virtual AdditionalAgreement AdditionalAgreement {
-			get => additionalAgreement;
-			set => SetField(ref additionalAgreement, value, () => AdditionalAgreement);
+		public virtual int AdditionalAgreementId {
+			get => additionalAgreementId;
+			set => SetField(ref additionalAgreementId, value);
 		}
 
 		int warrantyNumber;
@@ -63,40 +63,36 @@ namespace Vodovoz.Domain.Orders.Documents
 		[Display(Name = "Номер гарантийного талона")]
 		public virtual int WarrantyNumber {
 			get => warrantyNumber;
-			set => SetField(ref warrantyNumber, value, () => WarrantyNumber);
+			set => SetField(ref warrantyNumber, value);
 		}
 
 		public virtual string WarrantyFullNumber {
 			get {
 				if(contract == null)
 					return "";
-				if(additionalAgreement == null)
+				if(additionalAgreementId == 0)
 					return String.Format("{0}/Г-{1}", contract.Id, warrantyNumber);
-				return String.Format("{0}/{1}-{2}/Г-{3}", contract.Id, AdditionalAgreement.GetTypePrefix(additionalAgreement.Type), additionalAgreement.AgreementNumber, warrantyNumber);
+				return String.Format("{0}/{1}-{2}/Г-{3}", contract.Id, AdditionalAgreementId.GetTypePrefix(additionalAgreement.Type), additionalAgreement.AgreementNumber, warrantyNumber);
 			}
 		}
-
-		/// <summary>
-		/// Возвращает уникальный номер для нового гарантийного талона в пределах договора и доп. соглашения, 
-		/// или только договора (продажа, если нет доп. соглашения)
-		/// </summary>
-		/// <returns>The number.</returns>
-		/// <param name="order">Заказ</param>
-		/// <param name="agreement">Дополнительное соглашение</param>
-		public static int GetNumber(Order order, AdditionalAgreement agreement = null)
+		
+		public static string GetTypePrefix(AgreementType type)
 		{
-			//Вычисляем номер для нового гарантийного талона.
-			var orderDocuments = order.OrderDocuments;
-			var coolerWarrantyNumbers = orderDocuments.Where(x => x.Type == OrderDocumentType.CoolerWarranty)
-													  .OfType<CoolerWarrantyDocument>()
-													  .Where(x => x.AdditionalAgreement == agreement)
-													  .Select(x => x.WarrantyNumber)
-													  .ToList();
-
-
-			coolerWarrantyNumbers.Sort();
-
-			return coolerWarrantyNumbers.Any() ? coolerWarrantyNumbers.Last() + 1 : 1;
+			switch (type)
+			{
+				case AgreementType.DailyRent:
+					return "АС";
+				case AgreementType.NonfreeRent:
+					return "АМ";
+				case AgreementType.FreeRent:
+					return "Б";
+				case AgreementType.Repair:
+					return "Т";
+				case AgreementType.WaterSales:
+					return "В";
+				case AgreementType.EquipmentSales:
+					return "П";
+			}
 		}
 	}
 }
