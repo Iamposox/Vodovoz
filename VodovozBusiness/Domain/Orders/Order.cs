@@ -150,14 +150,6 @@ namespace Vodovoz.Domain.Orders
 		public virtual DeliveryPoint DeliveryPoint {
 			get => deliveryPoint;
 			set {
-				//Для изменения уже закрытого или завершенного заказа из закртытия МЛ
-				if(orderRepository.GetOnClosingOrderStatuses().Contains(OrderStatus)
-				   //чтобы не обрабатывались действия при изменении только точки доставки
-				   //когда меняется клиент (так как вместе с ним обязательно будет менять еще и точка доставки)
-				   && deliveryPoint != null && Client.DeliveryPoints.Any(d => d.Id == deliveryPoint.Id)) {
-					OnChangeDeliveryPoint();
-				}
-
 				if(SetField(ref deliveryPoint, value, () => DeliveryPoint) && value != null) {
 					if(DeliverySchedule == null)
 						DeliverySchedule = value.DeliverySchedule;
@@ -183,18 +175,7 @@ namespace Vodovoz.Domain.Orders
 		[HistoryDateOnly]
 		public virtual DateTime? DeliveryDate {
 			get => deliveryDate;
-			set {
-				SetField(ref deliveryDate, value, () => DeliveryDate);
-				if(NHibernate.NHibernateUtil.IsInitialized(OrderDocuments) && value.HasValue) {
-					foreach(OrderDocument document in OrderDocuments) {
-						if(document.Type == OrderDocumentType.AdditionalAgreement) {
-							(document as OrderAgreement).AdditionalAgreement.IssueDate = value.Value;
-							(document as OrderAgreement).AdditionalAgreement.StartDate = value.Value;
-						}
-						//TODO FIXME Когда сделаю добавление документов для печати - фильтровать их здесь и не менять им дату.
-					}
-				}
-			}
+			set => SetField(ref deliveryDate, value, () => DeliveryDate);
 		}
 
 		DateTime billDate = DateTime.Now;
@@ -1030,13 +1011,6 @@ namespace Vodovoz.Domain.Orders
 				yield return new ValidationResult("В возврате залогов в заказе необходимо вводить положительную сумму.");
 			}
 
-			if(!IsLoadedFrom1C && ObservableOrderItems.Any(x => x.Nomenclature.Category == NomenclatureCategory.water && x.Nomenclature.IsDisposableTare) &&
-			   //Если нет ни одного допсоглашения на воду подходящего на точку доставку в заказе 
-			   //(или без точки доставки если относится на все точки)
-			   !HasActualWaterSaleAgreementByDeliveryPoint()) {
-				yield return new ValidationResult("В заказе выбрана точка доставки для которой нет актуального дополнительного соглашения по доставке воды");
-			}
-
 			if(!ServicesConfig.CommonServices.CurrentPermissionService.ValidatePresetPermission("can_can_create_order_in_advance")
 			   && DeliveryDate.HasValue && DeliveryDate.Value < DateTime.Today
 			   && OrderStatus <= OrderStatus.Accepted) {
@@ -1175,17 +1149,6 @@ namespace Vodovoz.Domain.Orders
 
 		private void OnChangeContract(bool changedClient = false)
 		{
-			foreach(var item in ObservableOrderItems.Where(x => x.AdditionalAgreement != null)) {
-
-				if(item.AdditionalAgreement.Self is WaterSalesAgreement) {
-					var waterAgreement = Contract.GetWaterSalesAgreement(DeliveryPoint);
-					if(waterAgreement == null) {
-						waterAgreement = ClientDocumentsRepository.CreateDefaultWaterAgreement(UoW, DeliveryPoint, DeliveryDate, Contract);
-						Contract.ObservableAdditionalAgreements.Add(waterAgreement);
-					}
-					item.AdditionalAgreement = waterAgreement;
-				}
-			}
 			UpdateDocuments();
 		}
 
@@ -1196,17 +1159,6 @@ namespace Vodovoz.Domain.Orders
 				Contract = FindOrCreateContract(Client);
 			}
 			OnChangeContract();
-		}
-
-		private void OnChangeDeliveryPoint()
-		{
-			foreach(OrderItem item in ObservableOrderItems.Where(x => x.AdditionalAgreement != null)) {
-				//меняем только у тех соглашений у которых ранее была указана точка доставки
-				if(item.AdditionalAgreement.Self.DeliveryPoint != null) {
-					item.AdditionalAgreement.Self.DeliveryPoint = DeliveryPoint;
-				}
-			}
-
 		}
 
 		#endregion
@@ -1353,114 +1305,9 @@ namespace Vodovoz.Domain.Orders
 
 			if(actualContract != oldContract) {
 				Contract = actualContract;
-				ChangeWaterAgreementContractChanged(actualContract, oldContract);
 			}
 
 			UpdateDocuments();
-		}
-
-		/// <summary>
-		/// При смене точки доставки переделывает связанные с доп соглашением на воду
-		/// элементы в заказе на актуальное доп соглашение точки доставки.
-		/// </summary>
-		public virtual void ChangeWaterAgreementDeliveryPointChanged()
-		{
-			if(!this.HasWater() || Contract == null)
-				return;
-
-			var wsa = Contract.GetWaterSalesAgreement(DeliveryPoint);
-			if(wsa == null)
-				return;
-
-			var waterCategories = Nomenclature.GetCategoriesRequirementForWaterAgreement();
-			var waterItems = OrderItems.Where(x => waterCategories.Contains(x.Nomenclature.Category)).ToList();
-
-			//Необходимо для автоматического пересчёта бывших фиксированных цен
-			foreach(var item in waterItems.Where(i => i.GetWaterFixedPrice() != null)) {
-				item.IsUserPrice = false;
-			}
-			//Привязываем товары на новое доп соглашение
-			waterItems.ForEach(x => x.AdditionalAgreement = wsa);
-
-			//Пересчёт цен промо-наборов
-			if(promotionalSets.Count > 0) {
-				foreach(OrderItem item in ObservableOrderItems.Where(i => i.PromoSet != null))
-					item.Price = item.Nomenclature.GetPrice(item.Count);
-			}
-			//Пересчёт цен фиксы по новому допсоглашению
-			UpdatePrices(wsa);
-			//Остальной пересчёт цен
-			RecalculateItemsPrice();
-		}
-
-		/// <summary>
-		/// При смене договора переделывает связанные с доп соглашением на воду
-		/// все елементы в заказе на актуальное доп соглашение измененного договора.
-		/// ВНИМАНИЕ! Использовать только при смене договора
-		/// </summary>
-		private void ChangeWaterAgreementContractChanged(CounterpartyContract actualContract, CounterpartyContract oldContract)
-		{
-			if(oldContract == null) {
-				return;
-			}
-			var waterCategories = Nomenclature.GetCategoriesRequirementForWaterAgreement();
-			var oldWaterAgreement = oldContract.GetWaterSalesAgreement(DeliveryPoint);
-			var waterItems = OrderItems.Where(x => waterCategories.Contains(x.Nomenclature.Category))
-									   .ToList();
-			var waterDocuments = OrderDocuments.OfType<OrderAgreement>()
-											   .Where(x => (x.AdditionalAgreement.Self as WaterSalesAgreement) == oldWaterAgreement)
-											   .ToList();
-
-			if(!HasWater()) {
-				return;
-			}
-
-			var actualWaterAgreement = actualContract.GetWaterSalesAgreement(DeliveryPoint);
-			if(actualWaterAgreement == null) {
-				//Создаем новое доп соглашение воды.
-				var newWaterAgreement = ClientDocumentsRepository.CreateDefaultWaterAgreement(UoW, DeliveryPoint, DeliveryDate, actualContract);
-
-				//Переносим фикс цены.
-				if(oldWaterAgreement.HasFixedPrice) {
-					newWaterAgreement = WaterPricesRepository.FillWaterFixedPrices(UoW, newWaterAgreement, oldWaterAgreement.FixedPrices.ToList());
-				}
-				//Привязываем товары и документы на новое доп соглашение
-				waterItems.ForEach(x => x.AdditionalAgreement = newWaterAgreement);
-				waterDocuments.ForEach(x => x.AdditionalAgreement = newWaterAgreement);
-
-			} else {
-				//Привязываем товары и документы на новое доп соглашение
-				waterItems.ForEach(x => x.AdditionalAgreement = actualWaterAgreement);
-				waterDocuments.ForEach(x => x.AdditionalAgreement = actualWaterAgreement);
-				//Обновляем цены на воду в заказе по доп соглашению.
-				UpdatePrices(actualWaterAgreement);
-			}
-		}
-
-		public virtual void UpdatePrices()
-		{
-			var agreement = Contract.GetWaterSalesAgreement(DeliveryPoint);
-			UoW.Session.Refresh(agreement);
-			UpdatePrices(agreement);
-		}
-
-		public virtual void UpdatePrices(int[] agrIds)
-		{
-			var agreements = Contract.AdditionalAgreements.Select(a => a.Self).OfType<WaterSalesAgreement>().Where(a => agrIds.Contains(a.Id));
-			foreach(var item in agreements) {
-				UoW.Session.Refresh(item);
-				UpdatePrices(item);
-			}
-		}
-
-		public virtual void UpdatePrices(WaterSalesAgreement agreement)
-		{
-			var pricesMap = agreement.FixedPrices.ToDictionary(p => (int)p.Nomenclature.Id, p => (decimal)p.Price);
-
-			foreach(OrderItem oItem in ObservableOrderItems) {
-				if(pricesMap.ContainsKey(oItem.Nomenclature.Id) && oItem.Price != pricesMap[oItem.Nomenclature.Id])
-					oItem.Price = pricesMap[oItem.Nomenclature.Id];
-			}
 		}
 
 		public virtual bool HasWater()
@@ -1531,63 +1378,6 @@ namespace Vodovoz.Domain.Orders
 				Contract = Repositories.CounterpartyContractRepository.GetCounterpartyContractByPaymentType(UoW, Client, Client.PersonType, PaymentType);
 		}
 
-		public virtual bool HasActualWaterSaleAgreementByDeliveryPoint()
-		{
-			if(Contract == null)
-				return false;
-
-			var waterSalesAgreementList = Contract.AdditionalAgreements
-												   .Where(x => !x.IsCancelled)
-												   .Select(x => x.Self)
-												   .OfType<WaterSalesAgreement>();
-			return waterSalesAgreementList.Any(x => x.DeliveryPoint == null || (DeliveryPoint != null && x.DeliveryPoint.Id == DeliveryPoint.Id));
-		}
-
-		/// <summary>
-		/// Adds the equipment nomenclature for sale.
-		/// </summary>
-		/// <param name="nomenclature">Nomenclature.</param>
-		/// <param name="UoW">Uo w.</param>
-		public virtual void AddEquipmentNomenclatureForSale(AdditionalAgreement agreement, Nomenclature nomenclature, IUnitOfWork UoW)
-		{
-			AddEquipmentForSale(agreement, nomenclature, UoW);
-			UpdateDocuments();
-		}
-
-		public virtual void AddEquipmentNomenclatureForSale(AdditionalAgreement agreement, IEnumerable<Nomenclature> nomenclatures, IUnitOfWork UoW)
-		{
-			foreach(var item in nomenclatures) {
-				AddEquipmentForSale(agreement, item, UoW);
-			}
-			UpdateDocuments();
-		}
-
-		void AddEquipmentForSale(AdditionalAgreement agreement, Nomenclature nomenclature, IUnitOfWork uow)
-		{
-			if(nomenclature.Category != NomenclatureCategory.equipment)
-				return;
-			if(!nomenclature.IsSerial) {
-				ObservableOrderItems.Add(new OrderItem {
-					Order = this,
-					AdditionalAgreement = agreement,
-					Count = 0,
-					Equipment = null,
-					Nomenclature = nomenclature,
-					Price = nomenclature.GetPrice(1)
-				});
-			} else {
-				Equipment eq = Repositories.EquipmentRepository.GetEquipmentForSaleByNomenclature(uow, nomenclature);
-				ObservableOrderItems.AddWithReturn(new OrderItem {
-					Order = this,
-					AdditionalAgreement = agreement,
-					Count = 1,
-					Equipment = eq,
-					Nomenclature = nomenclature,
-					Price = nomenclature.GetPrice(1)
-				});
-			}
-		}
-
 		public virtual void AddEquipmentNomenclatureToClient(Nomenclature nomenclature, IUnitOfWork UoW)
 		{
 			ObservableOrderEquipments.Add(
@@ -1635,7 +1425,6 @@ namespace Vodovoz.Domain.Orders
 
 			ObservableOrderItems.Add(new OrderItem {
 				Order = this,
-				AdditionalAgreement = null,
 				Count = count,
 				Equipment = null,
 				Nomenclature = nomenclature,
@@ -1668,7 +1457,6 @@ namespace Vodovoz.Domain.Orders
 
 			ObservableOrderItems.Add(new OrderItem {
 				Order = this,
-				AdditionalAgreement = null,
 				Count = count,
 				Equipment = null,
 				Nomenclature = nomenclature,
@@ -1680,10 +1468,10 @@ namespace Vodovoz.Domain.Orders
 				AddAnyGoodsNomenclatureForSale(followingNomenclature, false, 1);
 		}
 
-		public virtual OrderItem AddWaterForSale(Nomenclature nomenclature, WaterSalesAgreement wsa, int count, decimal discount = 0, bool discountInMoney = false, DiscountReason reason = null, PromotionalSet proSet = null)
+		public virtual void AddWaterForSale(Nomenclature nomenclature, int count, decimal discount = 0, bool discountInMoney = false, DiscountReason reason = null, PromotionalSet proSet = null)
 		{
 			if(nomenclature.Category != NomenclatureCategory.water && !nomenclature.IsDisposableTare)
-				return null;
+				return;
 
 			//Если номенклатура промо-набора добавляется по фиксе (без скидки), то у нового OrderItem убирается поле discountReason
 			if(proSet != null && discount == 0) {
@@ -1699,17 +1487,12 @@ namespace Vodovoz.Domain.Orders
 			//влияющая номенклатура
 			Nomenclature infuentialNomenclature = nomenclature?.DependsOnNomenclature;
 
-			if(wsa.HasFixedPrice && wsa.FixedPrices.Any(x => x.Nomenclature.Id == nomenclature.Id && infuentialNomenclature == null)) {
-				price = wsa.FixedPrices.First(x => x.Nomenclature.Id == nomenclature.Id).Price;
-			} else if(wsa.HasFixedPrice && wsa.FixedPrices.Any(x => x.Nomenclature.Id == infuentialNomenclature?.Id)) {
-				price = wsa.FixedPrices.First(x => x.Nomenclature.Id == infuentialNomenclature?.Id).Price;
-			} else {
-				price = nomenclature.GetPrice(proSet == null ? GetTotalWater19LCount(doNotCountWaterFromPromoSets: true) : count);
-			}
+			//TODO Добавить получение цены из фиксы, плюс проверить зависимую номенклатуру
+			price = nomenclature.GetPrice(proSet == null ? GetTotalWater19LCount(doNotCountWaterFromPromoSets: true) : count);
+			
 
 			var oi = new OrderItem {
 				Order = this,
-				AdditionalAgreement = wsa,
 				Count = count,
 				Equipment = null,
 				Nomenclature = nomenclature,
@@ -1720,12 +1503,13 @@ namespace Vodovoz.Domain.Orders
 				PromoSet = proSet
 			};
 			ObservableOrderItems.Add(oi);
-			return oi;
 		}
 
-		public virtual IEnumerable<Nomenclature> GetNomenclaturesWithFixPrices => Client.CounterpartyContracts.
-		SelectMany(c => c.AdditionalAgreements).OfType<WaterSalesAgreement>()
-				.SelectMany(a => a.FixedPrices).Select(p => p.Nomenclature);
+		public virtual IEnumerable<Nomenclature> GetNomenclaturesWithFixPrices{
+			get {
+				throw new NotImplementedException();
+			}
+		}
 
 		public virtual void UpdateClientDefaultParam()
 		{
@@ -1847,13 +1631,11 @@ namespace Vodovoz.Domain.Orders
 				return;
 			ObservableOrderItems.Add(new OrderItem {
 				Order = this,
-				AdditionalAgreement = orderItem.AdditionalAgreement,
 				Count = orderItem.Nomenclature.Category == NomenclatureCategory.service ? 1 : 0,
 				Equipment = orderItem.Equipment,
 				Nomenclature = orderItem.Nomenclature,
 				Price = orderItem.Price
 			});
-			//UpdateDocuments();
 		}
 
 		public virtual void AddNomenclature(Nomenclature nomenclature, int count = 0, decimal discount = 0, bool discountInMoney = false, DiscountReason discountReason = null, PromotionalSet proSet = null)
@@ -1861,20 +1643,12 @@ namespace Vodovoz.Domain.Orders
 			OrderItem oi = null;
 			switch(nomenclature.Category) {
 				case NomenclatureCategory.water:
-					var ag = CreateWaterSalesAgreement(nomenclature);
-					//Если промо-набор с фиксой был применён к новому доп.соглашению
-					if(proSet != null && !ag.HasFixedPrice) {
-						foreach(var action in proSet.PromotionalSetActions.OfType<PromotionalSetActionFixPrice>())
-							action.Activate(this);
-						UoW.Session.Refresh(ag);
-					}
-					AddWaterForSale(nomenclature, ag, count, discount, discountInMoney, discountReason, proSet);
+					AddWaterForSale(nomenclature, count, discount, discountInMoney, discountReason, proSet);
 					break;
 				case NomenclatureCategory.master:
 					contract = CreateServiceContractAddMasterNomenclature(nomenclature);
 					break;
-				case NomenclatureCategory.deposit://Залог
-				default://rest
+				default:
 					oi = new OrderItem {
 						Count = count,
 						Nomenclature = nomenclature,
@@ -1987,21 +1761,6 @@ namespace Vodovoz.Domain.Orders
 			AddMasterNomenclature(nomenclature, 1, 1);
 			return Contract;
 		}
-
-		private WaterSalesAgreement CreateWaterSalesAgreement(Nomenclature nom)
-		{
-			if(Contract == null)
-				Contract = Repositories.CounterpartyContractRepository.GetCounterpartyContractByPaymentType(UoW, Client, Client.PersonType, PaymentType);
-
-			UoW.Session.Refresh(Contract);
-			WaterSalesAgreement wsa = Contract.GetWaterSalesAgreement(DeliveryPoint, nom);
-			if(wsa == null) {
-				wsa = ClientDocumentsRepository.CreateDefaultWaterAgreement(UoW, DeliveryPoint, DeliveryDate, Contract);
-				Contract.AdditionalAgreements.Add(wsa);
-				CreateOrderAgreementDocument(wsa);
-			}
-			return wsa;
-		}
 		
 		public virtual void ClearOrderItemsList()
 		{
@@ -2043,7 +1802,6 @@ namespace Vodovoz.Domain.Orders
 				ObservableOrderItems.Add(
 					new OrderItem {
 						Order = this,
-						AdditionalAgreement = orderItem.AdditionalAgreement,
 						Nomenclature = orderItem.Nomenclature,
 						Equipment = orderItem.Equipment,
 						PromoSet = orderItem.PromoSet,
@@ -2189,20 +1947,6 @@ namespace Vodovoz.Domain.Orders
 							});
 						}
 						break;
-					case OrderDocumentType.AdditionalAgreement:
-						OrderAgreement oa = (item as OrderAgreement);
-						if(observableOrderDocuments
-						   .OfType<OrderAgreement>()
-						   .FirstOrDefault(x => x.AdditionalAgreement == oa.AdditionalAgreement
-										   && x.Order == oa.Order)
-						   == null) {
-							ObservableOrderDocuments.Add(new OrderAgreement {
-								Order = item.Order,
-								AttachedToOrder = this,
-								AdditionalAgreement = oa.AdditionalAgreement
-							});
-						}
-						break;
 					case OrderDocumentType.M2Proxy:
 						OrderM2Proxy m2 = (item as OrderM2Proxy);
 						if(observableOrderDocuments
@@ -2213,44 +1957,7 @@ namespace Vodovoz.Domain.Orders
 							ObservableOrderDocuments.Add(m2);
 						}
 						break;
-					case OrderDocumentType.CoolerWarranty:
-						CoolerWarrantyDocument cwd = (item as CoolerWarrantyDocument);
-						if(observableOrderDocuments
-						   .OfType<CoolerWarrantyDocument>()
-						   .FirstOrDefault(x => x.AdditionalAgreement == cwd.AdditionalAgreement
-										   && x.Contract == cwd.Contract
-										   && x.WarrantyNumber == cwd.WarrantyNumber
-										   && x.Order == cwd.Order)
-						   == null) {
-							ObservableOrderDocuments.Add(new CoolerWarrantyDocument {
-								Order = item.Order,
-								AttachedToOrder = this,
-								AdditionalAgreement = cwd.AdditionalAgreement,
-								Contract = cwd.Contract,
-								WarrantyNumber = cwd.WarrantyNumber
-							});
-						}
-						break;
-					case OrderDocumentType.PumpWarranty:
-						PumpWarrantyDocument pwd = (item as PumpWarrantyDocument);
-						if(observableOrderDocuments
-						   .OfType<PumpWarrantyDocument>()
-						   .FirstOrDefault(x => x.AdditionalAgreement == pwd.AdditionalAgreement
-										   && x.Contract == pwd.Contract
-										   && x.WarrantyNumber == pwd.WarrantyNumber
-										   && x.Order == pwd.Order)
-						   == null) {
-							ObservableOrderDocuments.Add(new PumpWarrantyDocument {
-								Order = item.Order,
-								AttachedToOrder = this,
-								AdditionalAgreement = pwd.AdditionalAgreement,
-								Contract = pwd.Contract,
-								WarrantyNumber = pwd.WarrantyNumber
-							});
-						}
-						break;
 					case OrderDocumentType.Bill:
-						//case OrderDocumentType.BillWithoutSignature:
 						if(observableOrderDocuments
 						   .OfType<BillDocument>()
 						   .FirstOrDefault(x => x.Order == item.Order)
@@ -2497,9 +2204,6 @@ namespace Vodovoz.Domain.Orders
 		public virtual void RemoveAloneItem(OrderItem item)
 		{
 			if(item.Count == 0
-			   && (item.AdditionalAgreement == null
-				   || (item.AdditionalAgreement != null && item.AdditionalAgreement.Self is WaterSalesAgreement)
-				  )
 			   && !OrderEquipments.Any(x => x.OrderItem == item)) {
 				ObservableOrderItems.Remove(item);
 			}
@@ -2507,14 +2211,8 @@ namespace Vodovoz.Domain.Orders
 
 		public virtual void RemoveItem(OrderItem item)
 		{
-			if(item.AdditionalAgreement != null) {
-				ObservableOrderItems.Remove(item);
-				DeleteOrderEquipmentOnOrderItem(item);
-				DeleteOrderAgreementDocumentOnOrderItem(item);
-			} else {
-				ObservableOrderItems.Remove(item);
-				DeleteOrderEquipmentOnOrderItem(item);
-			}
+			ObservableOrderItems.Remove(item);
+			DeleteOrderEquipmentOnOrderItem(item);
 			UpdateDocuments();
 		}
 
@@ -2537,22 +2235,6 @@ namespace Vodovoz.Domain.Orders
 				ObservableOrderEquipments.Remove(orderEquipment);
 			}
 		}
-
-		/// <summary>
-		/// Удаляет документы дополнительного соглашения в заказе связанные с товаром в заказе
-		/// </summary>
-		/// <param name="orderItem">Товар в заказе по которому будет удалятся документ</param>
-		private void DeleteOrderAgreementDocumentOnOrderItem(OrderItem orderItem)
-		{
-			var orderDocuments = ObservableOrderDocuments
-				.OfType<OrderAgreement>()
-				.Where(x => x.AdditionalAgreement == orderItem.AdditionalAgreement)
-				.ToList();
-			foreach(var orderDocument in orderDocuments) {
-				ObservableOrderDocuments.Remove(orderDocument);
-			}
-		}
-
 
 		public virtual void RemoveDepositItem(OrderDepositItem item)
 		{
@@ -2594,33 +2276,6 @@ namespace Vodovoz.Domain.Orders
 					});
 				}
 			}
-		}
-
-		public virtual void AddServiceClaimAsFinal(ServiceClaim service)
-		{
-			//TODO FIXME скрыто до реализации работы заявок на сервисное обслуживание, 
-			//в связи с изменением работы документов DoneWorkDocument, EquipmentTransfer
-			/*if(service.FinalOrder != null && service.FinalOrder.Id == Id) {
-				if(ObservableOrderEquipments.FirstOrDefault(eq => eq.Equipment.Id == service.Equipment.Id) == null) {
-					ObservableOrderEquipments.Add(new OrderEquipment {
-						Order = this,
-						Direction = Direction.Deliver,
-						Equipment = service.Equipment,
-						OrderItem = null,
-						Reason = Reason.Service
-					});
-				}
-				if(ObservableOrderDocuments.Where(doc => doc.Type == OrderDocumentType.DoneWorkReport).Cast<DoneWorkDocument>()
-					.FirstOrDefault(doc => doc.ServiceClaim.Id == service.Id) == null) {
-					ObservableOrderDocuments.Add(new DoneWorkDocument {
-						Order = this,
-						AttachedToOrder = this,
-						ServiceClaim = service
-					});
-				}
-			}*/
-			//TODO FIXME Добавить строку сервиса OrderItems
-			//И вообще много чего тут сделать.
 		}
 
 		public virtual void FillNewEquipment(Equipment registeredEquipment)
@@ -3372,17 +3027,6 @@ namespace Vodovoz.Domain.Orders
 							}
 						);
 				}
-			}
-		}
-
-		public virtual void CreateOrderAgreementDocument(AdditionalAgreement agreement)
-		{
-			if(!ObservableOrderDocuments.OfType<OrderAgreement>().Any(x => x.AdditionalAgreement.Id == agreement.Id)) {
-				ObservableOrderDocuments.Add(new OrderAgreement {
-					Order = this,
-					AttachedToOrder = this,
-					AdditionalAgreement = agreement
-				});
 			}
 		}
 

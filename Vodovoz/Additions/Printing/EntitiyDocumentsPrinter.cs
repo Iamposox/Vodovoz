@@ -49,11 +49,6 @@ namespace Vodovoz.Additions.Printing
 			foreach(var item in currentOrder.OrderDocuments) {
 				if(item is IPrintableOdtDocument) {
 					switch(item.Type) {
-						case OrderDocumentType.AdditionalAgreement:
-							if((item as IPrintableOdtDocument).GetTemplate() == null)
-								successfulUpdate = (item as OrderAgreement).AdditionalAgreement.UpdateContractTemplate(currentOrder.UoW);
-							(item as OrderAgreement).PrepareTemplate(currentOrder.UoW);
-							break;
 						case OrderDocumentType.Contract:
 							if((item as IPrintableOdtDocument).GetTemplate() == null)
 								successfulUpdate = (item as OrderContract).Contract.UpdateContractTemplate(currentOrder.UoW);

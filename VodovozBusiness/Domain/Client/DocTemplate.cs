@@ -116,11 +116,6 @@ namespace Vodovoz.Domain.Client
 			Name = templateType.GetEnumTitle();
 		}
 
-		#region Функции
-
-
-		#endregion
-
 		#region Статические
 
 		public static IDocParser CreateParser(TemplateType type)
@@ -129,10 +124,6 @@ namespace Vodovoz.Domain.Client
 			{
 				case TemplateType.Contract:
 					return new ContractParser();
-				case TemplateType.AgWater:
-					return new WaterAgreementParser();
-				case TemplateType.AgLongRent:
-					return new NonFreeRentAgreementParser();
 				case TemplateType.CarProxy:
 					return new CarProxyDocumentParser();
 				case TemplateType.M2Proxy:
@@ -151,14 +142,6 @@ namespace Vodovoz.Domain.Client
 	{
 		[Display (Name = "Основной договор")]
 		Contract,
-		[Display (Name = "Доп. соглашение на воду")]
-		AgWater,
-		[Display (Name = "Доп. соглашение бесплатной аренды")]
-		AgFreeRent,
-		[Display (Name = "Доп. соглашение короткосрочной аренды")]
-		AgShortRent,
-		[Display (Name = "Доп. соглашение долгосрочной аренды")]
-		AgLongRent,
 		[Display (Name = "Доверенность на ТС")]
 		CarProxy,
 		[Display(Name = "Доверенность М-2")]
