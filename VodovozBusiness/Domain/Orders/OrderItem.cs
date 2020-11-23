@@ -97,8 +97,6 @@ namespace Vodovoz.Domain.Orders
 					IsUserPrice = value != GetPriceByTotalCount() && value != 0;
 
 				if(SetField(ref price, value, () => Price)) {
-					if(AdditionalAgreement?.Self is SalesEquipmentAgreement aa)
-						aa.UpdatePrice(Nomenclature, value);
 					RecalculateDiscount();
 					RecalculateNDS();
 				}
@@ -121,8 +119,6 @@ namespace Vodovoz.Domain.Orders
 			get => count;
 			set {
 				if(SetField(ref count, value)) {
-					if(AdditionalAgreement?.Self is SalesEquipmentAgreement aa)
-						aa.UpdateCount(Nomenclature, (int)value);
 					Order?.RecalculateItemsPrice();
 					RecalculateDiscount();
 					RecalculateNDS();
@@ -436,9 +432,6 @@ namespace Vodovoz.Domain.Orders
 				bool result = AdditionalAgreement == null;
 
 				if(AdditionalAgreement?.Type == AgreementType.WaterSales)
-					result = true;
-
-				if(AdditionalAgreement?.Type == AgreementType.EquipmentSales)
 					result = true;
 
 				if(IsRentRenewal())
