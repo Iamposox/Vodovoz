@@ -298,11 +298,6 @@ namespace Vodovoz.Domain.Orders
 					}
 				}
 
-				if(AdditionalAgreement.Self is DailyRentAgreement) {
-					DailyRentAgreement dailyRent = AdditionalAgreement.Self as DailyRentAgreement;
-					return dailyRent.RentDays;
-				}
-
 				return 0;
 			}
 		}
@@ -590,9 +585,6 @@ namespace Vodovoz.Domain.Orders
 
 		public virtual void DeletePaidRentEquipment(IUnitOfWork uow)
 		{
-			if(this.AdditionalAgreement is DailyRentAgreement)
-				((DailyRentAgreement)this.AdditionalAgreement).RemoveEquipment(this.PaidRentEquipment);
-
 			if(this.AdditionalAgreement is NonfreeRentAgreement)
 				((NonfreeRentAgreement)this.AdditionalAgreement).RemoveEquipment(this.PaidRentEquipment);
 
