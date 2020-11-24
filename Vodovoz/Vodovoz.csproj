@@ -1465,6 +1465,7 @@
     <Compile Include="gtk-gui\Vodovoz.Views.FinancialDistrictsSetView.cs" />
     <Compile Include="Filters\GtkViews\FinancialDistrictsSetsJournalFilterView.cs" />
     <Compile Include="gtk-gui\Vodovoz.Filters.GtkViews.FinancialDistrictsSetsJournalFilterView.cs" />
+    <Compile Include="gtk-gui\Vodovoz.FreeRentPackageDlg.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
