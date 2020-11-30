@@ -281,6 +281,7 @@ namespace Vodovoz
 			contactsview1.Visible = false;
 			hboxCameFrom.Visible = (Entity.Id != 0 && Entity.CameFrom != null) || Entity.Id == 0;
 			rbnPrices.Toggled += OnRbnPricesToggled;
+			rbnFixedPrices.Toggled += OnRbnFixedPricesToggled;
 			SetVisibilityForCloseDeliveryComments();
 
 			int userId = ServicesConfig.CommonServices.UserService.CurrentUserId;
@@ -492,6 +493,12 @@ namespace Vodovoz
 		{
 			if(rbnPrices.Active)
 				notebook1.CurrentPage = 10;
+		}
+
+		protected void OnRbnFixedPricesToggled(object sender, EventArgs e)
+		{
+			if(rbnFixedPrices.Active)
+				notebook1.CurrentPage = 11;
 		}
 
 		void YEnumCounterpartyType_Changed(object sender, EventArgs e)
