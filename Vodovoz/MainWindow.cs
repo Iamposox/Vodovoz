@@ -78,6 +78,7 @@ using Vodovoz.ViewModels.Journals.JournalSelectors;
 using Vodovoz.ViewModels.Journals.JournalViewModels;
 using Vodovoz.ViewModels.Journals.JournalViewModels.Cash;
 using VodovozInfrastructure.Interfaces;
+using Vodovoz.Parameters;
 
 public partial class MainWindow : Gtk.Window
 {
@@ -343,7 +344,7 @@ public partial class MainWindow : Gtk.Window
 
 	protected void OnActionNomenclatureActivated(object sender, EventArgs e)
 	{
-		var nomenclatureRepository = new NomenclatureRepository();
+		var nomenclatureRepository = new NomenclatureRepository(new NomenclatureParametersProvider());
 
 		IEntityAutocompleteSelectorFactory counterpartySelectorFactory =
 			new DefaultEntityAutocompleteSelectorFactory<Counterparty, CounterpartyJournalViewModel,
@@ -694,7 +695,7 @@ public partial class MainWindow : Gtk.Window
 	{
 		IUndeliveriesViewOpener undeliveriesViewOpener = new UndeliveriesViewOpener();
 
-		var nomenclatureRepository = new NomenclatureRepository();
+		var nomenclatureRepository = new NomenclatureRepository(new NomenclatureParametersProvider());
 
 		IEntityAutocompleteSelectorFactory employeeSelectorFactory =
 			new DefaultEntityAutocompleteSelectorFactory<Employee, EmployeesJournalViewModel, EmployeeFilterViewModel>(
@@ -848,7 +849,7 @@ public partial class MainWindow : Gtk.Window
 	protected void OnActionProducedProductionReportActivated(object sender, EventArgs e)
 	{
 		#region DependencyCreation
-		var nomenclatureRepository = new NomenclatureRepository();
+		var nomenclatureRepository = new NomenclatureRepository(new NomenclatureParametersProvider());
 		
 		IEntityAutocompleteSelectorFactory counterpartySelectorFactory =
 			new DefaultEntityAutocompleteSelectorFactory<Counterparty, CounterpartyJournalViewModel,
@@ -1341,7 +1342,7 @@ public partial class MainWindow : Gtk.Window
 
 	protected void OnActionPromotionalSetsActivated(object sender, EventArgs e)
 	{
-		var nomenclatureRepository = new NomenclatureRepository();
+		var nomenclatureRepository = new NomenclatureRepository(new NomenclatureParametersProvider());
 
 		IEntityAutocompleteSelectorFactory counterpartySelectorFactory =
 			new DefaultEntityAutocompleteSelectorFactory<Counterparty, CounterpartyJournalViewModel,
