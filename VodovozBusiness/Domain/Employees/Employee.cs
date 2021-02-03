@@ -323,9 +323,17 @@ namespace Vodovoz.Domain.Employees
 			set => SetField(ref organisationForSalary, value);
 		}
 
-		#endregion
+        private string email;
+        [Display(Name = "Электронная почта пользователя")]
+        public virtual string Email
+        {
+            get => email;
+            set => SetField(ref email, value);
+        }
 
-		public Employee()
+        #endregion
+
+        public Employee()
 		{
 			Name = String.Empty;
 			LastName = String.Empty;

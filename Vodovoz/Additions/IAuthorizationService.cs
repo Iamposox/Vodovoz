@@ -6,7 +6,7 @@ namespace Vodovoz.Additions
 {
     public interface IAuthorizationService
     {
-        ResultMessage ResetPassword(Employee employee, string password);
+        void ResetPassword(Employee employee, string password);
         bool TryToSaveUser(Employee employee, IUnitOfWork uow);
         
     }

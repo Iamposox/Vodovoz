@@ -1,5 +1,5 @@
 using System;
-using FluentNHibernate.Data;
+using EmailService;
 using InstantSmsService;
 using NLog;
 using QS.Dialog.GtkUI;
@@ -7,7 +7,7 @@ using QS.DomainModel.UoW;
 using QS.Project.Repositories;
 using Vodovoz.Core.DataService;
 using Vodovoz.Domain.Employees;
-using Vodovoz.Services;
+using Vodovoz.Parameters;
 using Vodovoz.Tools;
 
 namespace Vodovoz.Additions
@@ -26,17 +26,14 @@ namespace Vodovoz.Additions
         private readonly MySQLUserRepository mySQLUserRepository;
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         
-        public ResultMessage ResetPassword(Employee employee, string password)
+        public void ResetPassword(Employee employee, string password)
         {
-            #region Инициализация
+            IEmailService emailService = EmailServiceSetting.GetEmailService();
 
-            IInstantSmsService service = InstantSmsServiceSetting.GetInstantSmsService();
-            if (service == null)
+            if (emailService == null)
             {
-                return new ResultMessage {ErrorDescription = "Сервис отправки Sms не работает, обратитесь в РПО."};
+                throw new Exception("Email service is null");
             }
-
-            #endregion
 
             #region МеняемПароль
 
@@ -45,39 +42,40 @@ namespace Vodovoz.Additions
 
             #endregion
 
-            #region ОтпарвляемSMS
+            #region Отпарвляем сообщение
             
-            string phone = CreatePhoneAndLogin(employee);
             string messageText = $"Логин: {login}\nПароль: {password}";
-            var smsNotification = new InstantSmsMessage
-            {
-	            MessageText = messageText,
-	            MobilePhone = phone,
-	            ExpiredTime = DateTime.Now.AddMinutes(10)
-            };
-            return  service.SendSms(smsNotification);
-            #endregion
-        }
 
-        private string CreatePhoneAndLogin(Employee employee)
-        {
-            string stringPhoneNumber = employee.GetPhoneForSmsNotification();
-            if (stringPhoneNumber == null)
+            EmailService.Email email = new EmailService.Email
             {
-                throw new ApplicationException($"У сотрудника {employee.Name} не найден телефон для отправки Sms");
+                Title = "Данные для входа в программу Доставка Воды",
+                Text = messageText,
+                Recipient = new EmailContact("", employee.Email),
+                Sender = new EmailContact("vodovoz-spb.ru", ParametersProvider.Instance.GetParameterValue("email_for_email_delivery"))
+            };
+
+            var result = emailService.SendEmail(email);
+
+            //Если произошла ошибка и письмо не отправлено
+            if (!result.Item1)
+            {
+                throw new Exception("Письмо не было отправлено! Причина: " + result.Item2);
             }
-            return $"+7{stringPhoneNumber}";
+
+            #endregion
         }
 
         public bool TryToSaveUser(Employee employee, IUnitOfWork uow)
         {
-	        var user = new User {
+            IEmailService emailService = EmailServiceSetting.GetEmailService();
+
+            var user = new User {
             	Login = employee.LoginForNewUser,
             	Name = employee.FullName,
             	NeedPasswordChange = true
             };
             bool cont = MessageDialogHelper.RunQuestionDialog($"При сохранении работника будет создан \nпользователь с логином {user.Login} \nи на " +
-            	$"указанный номер +7{employee.GetPhoneForSmsNotification()}\nбудет выслана SMS с временным паролем\n\t\t\tПродолжить?");
+            	$"указанный адрес {employee.Email}\nбудет выслано письмо с временным паролем\n\t\t\tПродолжить?");
             if(!cont)
             	return false;
 
@@ -93,27 +91,37 @@ namespace Vodovoz.Additions
             	}
                 uow.Save(user);
 
-            	logger.Info("Идёт отправка sms (до 10 секунд)...");
-            	bool sendResult = false;
-            	try {
-            		sendResult = SendPasswordByPhone(employee, password);
-            	} catch(TimeoutException) {
-            		RemoveUserData(uow, user);
-            		logger.Info("Ошибка при отправке sms");
-            		MessageDialogHelper.RunErrorDialog("Сервис отправки Sms временно недоступен\n");
-            		return false;
-            	} catch {
-            		RemoveUserData(uow, user);
-            		logger.Info("Ошибка при отправке sms");
-            		throw;
-            	}
-            	if(!sendResult) {
-            		//Если не получилось отправить смс с паролем - удаляем пользователя
-            		RemoveUserData(uow, user);
-            		logger.Info("Ошибка при отправке sms");
-            		return false;
-            	}
-            	logger.Info("Sms успешно отправлено");
+                logger.Info("Идёт отправка сообщения");
+
+                try
+                {
+                    #region Отпарвляем сообщение
+
+                    string messageText = $"Логин: {user.Login}\nПароль: {password}";
+
+                    EmailService.Email email = new EmailService.Email
+                    {
+                        Title = "Данные для входа в программу Доставка Воды",
+                        Text = messageText,
+                        Recipient = new EmailContact("", employee.Email),
+                        Sender = new EmailContact("vodovoz-spb.ru", ParametersProvider.Instance.GetParameterValue("email_for_email_delivery"))
+                    };
+
+                    var emailResult = emailService.SendEmail(email);
+
+                    //Если произошла ошибка и письмо не отправлено
+                    if (!emailResult.Item1)
+                    {
+                        throw new Exception("Письмо не было отправлено! Причина: " + emailResult.Item2);
+                    }
+
+                    #endregion
+                } catch (Exception ex)
+                {
+                    MessageDialogHelper.RunErrorDialog("Ошибка: " + ex.Message);
+                }
+
+                logger.Info("Sms успешно отправлено");
                 employee.User = user;
             } else {
             	MessageDialogHelper.RunErrorDialog("Не получилось создать нового пользователя");

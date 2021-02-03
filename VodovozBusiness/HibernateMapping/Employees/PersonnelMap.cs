@@ -22,7 +22,7 @@ namespace Vodovoz.HibernateMapping.Employees
 			Map(x => x.AddressRegistration)	.Column("address_registration");
 			Map(x => x.BirthdayDate)		.Column("birthday_date");
 			Map(x => x.AddressCurrent)		.Column("address_current");
-			Map(x => x.INN)					.Column("inn");
+            Map(x => x.INN)					.Column("inn");
 			Map(x => x.IsRussianCitizen).Column("is_russian_citizen");
 
 
@@ -40,7 +40,8 @@ namespace Vodovoz.HibernateMapping.Employees
 			{
 				DiscriminatorValue(EmployeeType.Employee.ToString());
 				Map(x => x.InnerPhone)				 .Column("inner_phone");
-				Map(x => x.Category)				 .Column("category").CustomType<EmployeeCategoryStringType>();
+                Map(x => x.Email)                    .Column("email_address");
+                Map(x => x.Category)				 .Column("category").CustomType<EmployeeCategoryStringType>();
 				Map(x => x.Status)					 .Column("status").CustomType<EmployeeStatusStringType>();
 				Map(x => x.AndroidLogin)			 .Column("android_login");
 				Map(x => x.AndroidPassword)			 .Column("android_password");

@@ -117,13 +117,13 @@ namespace Vodovoz.JournalViewModels
 		private void ResetPasswordForEmployee(Employee employee)
 		{
 			var passGenerator = new PasswordGenerator();
-			var result = authorizationService.ResetPassword(employee, passGenerator.GeneratePassword(5));
-			if (result.MessageStatus == SmsMessageStatus.Ok)
-			{
-				MessageDialogHelper.RunInfoDialog("Sms с паролем отправлена успешно");
-			} else {
-				MessageDialogHelper.RunErrorDialog(result.ErrorDescription, "Ошибка при отправке Sms");
-			}
+            try
+            {
+                authorizationService.ResetPassword(employee, passGenerator.GeneratePassword(5));
+            } catch (Exception ex)
+            {
+                MessageDialogHelper.RunErrorDialog("Ошибка: " + ex.Message);
+            }
 		}
 
 		protected override void CreatePopupActions()
