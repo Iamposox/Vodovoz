@@ -412,13 +412,12 @@ namespace Vodovoz.Domain.Employees
 				yield return new ValidationResult($"Недостаточно прав для увольнения сотрудников",
 						new[] { this.GetPropertyName(x => x.Status) });
 			}
-			if(!String.IsNullOrEmpty(LoginForNewUser)) {
-				string exist = GetPhoneForSmsNotification();
-				if(exist == null)
-					yield return new ValidationResult($"Для создания пользователя должен быть правильно указан мобильный телефон",
-							new[] { this.GetPropertyName(x => x.LoginForNewUser) });
-			}
-			if(Category == EmployeeCategory.driver && DriverOf == null) {
+            if (String.IsNullOrEmpty(Email))
+            {
+                yield return new ValidationResult($"Для создания пользователя должен быть указан адрес электронной почты",
+                        new[] { this.GetPropertyName(x => x.Email) });
+            }
+            if (Category == EmployeeCategory.driver && DriverOf == null) {
 				yield return new ValidationResult($"Обязательно должно быть выбрано поле 'Управляет а\\м'",
 					new[] { this.GetPropertyName(x => x.DriverOf) });
 			}
