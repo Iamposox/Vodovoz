@@ -37,7 +37,11 @@ namespace Vodovoz.Additions
 
             #region МеняемПароль
 
-            string login = employee.User.Login;
+            if(employee.User == null){
+                throw new Exception("Пользователь не существует");
+            }
+
+            string login = employee.User.Login ?? throw new Exception("У сотрудника не заполнено поля пользователя БД");
             mySQLUserRepository.ChangePassword(login, password);
 
             #endregion
