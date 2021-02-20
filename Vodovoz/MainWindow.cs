@@ -1834,4 +1834,12 @@ public partial class MainWindow : Gtk.Window
             () => new QSReport.ReportViewDlg(new OrderChangesReport())
         );
     }
+
+    protected void OnActionCarsExploitationReportActivated(object sender, EventArgs e)
+    {
+        tdiMain.OpenTab(
+            QSReport.ReportViewDlg.GenerateHashName<CarsExploitationReport>(),
+            () => new QSReport.ReportViewDlg(new CarsExploitationReport())
+        );
+    }
 }
