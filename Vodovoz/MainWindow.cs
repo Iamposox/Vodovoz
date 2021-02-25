@@ -1845,16 +1845,19 @@ public partial class MainWindow : Gtk.Window
                         IncludeArchive = false,
                         IncludeVisitingMasters = false,
                         RestrictedCarTypesOfUse =
-                            new List<CarTypeOfUse> { CarTypeOfUse.CompanyLargus, CarTypeOfUse.CompanyGAZelle, CarTypeOfUse.DriverCar }
+                            new List<CarTypeOfUse>
+                                { CarTypeOfUse.CompanyLargus, CarTypeOfUse.CompanyGAZelle, CarTypeOfUse.DriverCar }
                     };
 
                     return new CarJournalViewModel(filter, UnitOfWorkFactory.GetDefaultFactory,
                         ServicesConfig.CommonServices);
-                });
-        
+                }
+            );
+
         tdiMain.OpenTab(
             QSReport.ReportViewDlg.GenerateHashName<CarsExploitationReport>(),
-            () => new QSReport.ReportViewDlg(new CarsExploitationReport(carEntityAutocompleteSelectorFactory))
+            () => new QSReport.ReportViewDlg(new CarsExploitationReport(UnitOfWorkFactory.GetDefaultFactory,
+                carEntityAutocompleteSelectorFactory))
         );
     }
 }

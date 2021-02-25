@@ -13,7 +13,7 @@ namespace Vodovoz.Domain.Logistic
         
         private string name;
         [Display(Name = "Название")]
-        public string Name
+        public virtual string Name
         {
             get => name;
             set => SetField(ref name, value);
@@ -21,7 +21,7 @@ namespace Vodovoz.Domain.Logistic
         
         private bool isArchive;
         [Display(Name = "Архивный")]
-        public bool IsArchive
+        public virtual bool IsArchive
         {
             get => isArchive;
             set => SetField(ref isArchive, value);
