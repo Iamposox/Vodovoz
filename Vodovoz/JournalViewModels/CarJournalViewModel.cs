@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using NHibernate;
 using NHibernate.Criterion;
 using NHibernate.Dialect.Function;
@@ -30,10 +31,21 @@ namespace Vodovoz.JournalViewModels
 			Employee driverAlias = null;
 
 			var query = uow.Session.QueryOver<Car>(() => carAlias)
-			.Left.JoinAlias(c => c.Driver, () => driverAlias);
+				.Left.JoinAlias(c => c.Driver, () => driverAlias);
 
-			if(FilterViewModel != null && !FilterViewModel.IncludeArchive) {
-				query.Where(c => !c.IsArchive);
+			if(FilterViewModel != null) {
+				if(!FilterViewModel.IncludeArchive) {
+					query.Where(c => !c.IsArchive);
+				}
+				
+				if(!FilterViewModel.IncludeVisitingMasters) {
+					query.Where(() => !driverAlias.VisitingMaster);
+				}
+
+				if(FilterViewModel.RestrictedCarTypesOfUse != null && FilterViewModel.RestrictedCarTypesOfUse.Any()) {
+					query.WhereRestrictionOn(c => c.TypeOfUse)
+						.IsIn(FilterViewModel.RestrictedCarTypesOfUse.ToArray());
+				}
 			}
 
 			query.Where(GetSearchCriterion(

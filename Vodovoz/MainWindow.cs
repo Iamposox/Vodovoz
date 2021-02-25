@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Autofac;
 using Gtk;
@@ -1837,9 +1838,23 @@ public partial class MainWindow : Gtk.Window
 
     protected void OnActionCarsExploitationReportActivated(object sender, EventArgs e)
     {
+        IEntityAutocompleteSelectorFactory carEntityAutocompleteSelectorFactory
+            = new EntityAutocompleteSelectorFactory<CarJournalViewModel>(typeof(Car),
+                () => {
+                    var filter = new CarJournalFilterViewModel {
+                        IncludeArchive = false,
+                        IncludeVisitingMasters = false,
+                        RestrictedCarTypesOfUse =
+                            new List<CarTypeOfUse> { CarTypeOfUse.CompanyLargus, CarTypeOfUse.CompanyGAZelle, CarTypeOfUse.DriverCar }
+                    };
+
+                    return new CarJournalViewModel(filter, UnitOfWorkFactory.GetDefaultFactory,
+                        ServicesConfig.CommonServices);
+                });
+        
         tdiMain.OpenTab(
             QSReport.ReportViewDlg.GenerateHashName<CarsExploitationReport>(),
-            () => new QSReport.ReportViewDlg(new CarsExploitationReport())
+            () => new QSReport.ReportViewDlg(new CarsExploitationReport(carEntityAutocompleteSelectorFactory))
         );
     }
 }
