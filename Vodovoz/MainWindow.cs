@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Bindings.Collections.Generic;
 using System.Linq;
 using Autofac;
 using Gtk;
@@ -25,6 +26,7 @@ using QSOrmProject;
 using QSProjectsLib;
 using QSSupportLib;
 using Vodovoz;
+using Vodovoz.CommonEnums;
 using Vodovoz.Core;
 using Vodovoz.Dialogs.OnlineStore;
 using Vodovoz.Dialogs.OrderWidgets;
@@ -88,6 +90,7 @@ using Vodovoz.ViewModels.Journals.JournalViewModels.Proposal;
 using Vodovoz.ViewModels.Accounting;
 using Vodovoz.Tools.Logistic;
 using Vodovoz.Infrastructure;
+using Vodovoz.ViewModels.Journals.FilterViewModels.Logistic;
 
 public partial class MainWindow : Gtk.Window
 {
@@ -185,7 +188,8 @@ public partial class MainWindow : Gtk.Window
 
         bool userIsSalesRepresentative;
 
-        using (var uow = UnitOfWorkFactory.CreateWithoutRoot()){
+        using (var uow = UnitOfWorkFactory.CreateWithoutRoot())
+        {
             userIsSalesRepresentative = ServicesConfig.CommonServices.CurrentPermissionService.ValidatePresetPermission("user_is_sales_representative")
             && !ServicesConfig.CommonServices.UserService.GetCurrentUser(uow).IsAdmin;
         }
@@ -205,7 +209,7 @@ public partial class MainWindow : Gtk.Window
 
         // Отчеты в Продажи
 
-        ActionOrderCreationDateReport.Visible = 
+        ActionOrderCreationDateReport.Visible =
             ActionPlanImplementationReport.Visible =
             ActionSetBillsReport.Visible = !userIsSalesRepresentative;
     }
@@ -1840,15 +1844,16 @@ public partial class MainWindow : Gtk.Window
     {
         IEntityAutocompleteSelectorFactory carEntityAutocompleteSelectorFactory
             = new EntityAutocompleteSelectorFactory<CarJournalViewModel>(typeof(Car),
-                () => {
-                    var filter = new CarJournalFilterViewModel {
+                () =>
+                {
+                    var filter = new CarJournalFilterViewModel
+                    {
                         IncludeArchive = false,
-                        IncludeVisitingMasters = false,
-                        RestrictedCarTypesOfUse =
-                            new List<CarTypeOfUse>
-                                { CarTypeOfUse.CompanyLargus, CarTypeOfUse.CompanyGAZelle, CarTypeOfUse.DriverCar }
+                        VisitingMasters = AllYesNo.No,
+                        RestrictedCarTypesOfUse = new List<CarTypeOfUse>(
+                            new[] { CarTypeOfUse.CompanyLargus, CarTypeOfUse.CompanyGAZelle, CarTypeOfUse.DriverCar })
                     };
-
+                    filter.SetFilterSensetivity(false);
                     return new CarJournalViewModel(filter, UnitOfWorkFactory.GetDefaultFactory,
                         ServicesConfig.CommonServices);
                 }
@@ -1858,6 +1863,19 @@ public partial class MainWindow : Gtk.Window
             QSReport.ReportViewDlg.GenerateHashName<CarsExploitationReport>(),
             () => new QSReport.ReportViewDlg(new CarsExploitationReport(UnitOfWorkFactory.GetDefaultFactory,
                 carEntityAutocompleteSelectorFactory))
+        );
+    }
+
+    protected void OnActionDriverCarKindActivated(object sender, EventArgs e)
+    {
+        var filter = new DriverCarKindJournalFilterViewModel { HidenByDefault = true };
+
+        tdiMain.AddTab(
+            new DriverCarKindJournalViewModel(
+                filter,
+                UnitOfWorkFactory.GetDefaultFactory,
+                ServicesConfig.CommonServices
+            )
         );
     }
 }

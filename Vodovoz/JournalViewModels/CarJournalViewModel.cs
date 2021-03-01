@@ -7,6 +7,7 @@ using NHibernate.Transform;
 using QS.DomainModel.UoW;
 using QS.Project.Journal;
 using QS.Services;
+using Vodovoz.CommonEnums;
 using Vodovoz.Domain.Employees;
 using Vodovoz.Domain.Logistic;
 using Vodovoz.Filters.ViewModels;
@@ -37,14 +38,37 @@ namespace Vodovoz.JournalViewModels
 				if(!FilterViewModel.IncludeArchive) {
 					query.Where(c => !c.IsArchive);
 				}
+
+				switch(FilterViewModel.VisitingMasters) {
+					case AllYesNo.All:
+						break;
+					case AllYesNo.Yes:
+						query.Where(() => driverAlias.VisitingMaster);
+						break;
+					case AllYesNo.No:
+						query.Where(() => !driverAlias.VisitingMaster);
+						break;
+				}
 				
-				if(!FilterViewModel.IncludeVisitingMasters) {
-					query.Where(() => !driverAlias.VisitingMaster);
+				switch(FilterViewModel.Raskat) {
+					case AllYesNo.All:
+						break;
+					case AllYesNo.Yes:
+						query.Where(() => carAlias.IsRaskat);
+						break;
+					case AllYesNo.No:
+						query.Where(() => !carAlias.IsRaskat);
+						break;
 				}
 
-				if(FilterViewModel.RestrictedCarTypesOfUse != null && FilterViewModel.RestrictedCarTypesOfUse.Any()) {
-					query.WhereRestrictionOn(c => c.TypeOfUse)
-						.IsIn(FilterViewModel.RestrictedCarTypesOfUse.ToArray());
+				if(FilterViewModel.RestrictedCarTypesOfUse != null) {
+					if(!FilterViewModel.RestrictedCarTypesOfUse.Any()) {
+						query.Where(Restrictions.IsNull(Projections.Property(() => carAlias.Id)));
+					}
+					else {
+						query.WhereRestrictionOn(c => c.TypeOfUse)
+							.IsIn(FilterViewModel.RestrictedCarTypesOfUse.ToArray());
+					}
 				}
 			}
 

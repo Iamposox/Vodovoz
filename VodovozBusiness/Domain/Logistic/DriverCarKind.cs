@@ -4,8 +4,8 @@ using QS.DomainModel.Entity;
 namespace Vodovoz.Domain.Logistic
 {
     [Appellative(Gender = GrammaticalGender.Masculine,
-        Nominative = "Вид наёмного автотранспорта",
-        NominativePlural = "Виды наёмного автотранспорта"
+        Nominative = "Вид наёмного автомобиля",
+        NominativePlural = "Виды наёмных автомобилей"
     )]
     public class DriverCarKind : PropertyChangedBase, IDomainObject
     {

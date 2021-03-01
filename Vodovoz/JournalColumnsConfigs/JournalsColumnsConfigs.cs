@@ -65,6 +65,14 @@ namespace Vodovoz.JournalColumnsConfigs
 					.Finish()
 			);
 			
+			//DriverCarKindJournalViewModel
+			TreeViewColumnsConfigFactory.Register<DriverCarKindJournalViewModel>(
+				() => FluentColumnsConfig<DriverCarKindNode>.Create()
+					.AddColumn("Код").AddTextRenderer(node => node.Id.ToString())
+					.AddColumn("Название").AddTextRenderer(node => node.Name)
+					.Finish()
+			);
+			
 			//OrderJournalViewModel
 			TreeViewColumnsConfigFactory.Register<OrderJournalViewModel>(
 				() => FluentColumnsConfig<OrderJournalNode>.Create()
