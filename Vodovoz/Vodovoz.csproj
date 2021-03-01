@@ -1974,6 +1974,9 @@
     <None Include="Reports\Cash\CashFlowDetailIncomeReturn.rdl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Reports\Logistic\CarsExploitationReport.rdl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Reports\Orders\OrderChangesReport.rdl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
