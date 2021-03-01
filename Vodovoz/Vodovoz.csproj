@@ -1571,6 +1571,8 @@
     <Compile Include="gtk-gui\Vodovoz.Views.Retail.SalesChannelView.cs" />
     <Compile Include="Views\Client\CounterpartyFilesView.cs" />
     <Compile Include="gtk-gui\Vodovoz.Views.Client.CounterpartyFilesView.cs" />
+    <Compile Include="ReportsParameters\Logistic\CarsExploitationReport.cs" />
+    <Compile Include="gtk-gui\Vodovoz.ReportsParameters.Logistic.CarsExploitationReport.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

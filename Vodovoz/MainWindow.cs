@@ -1988,4 +1988,12 @@ public partial class MainWindow : Gtk.Window
             )
         );
     }
+    
+    protected void OnActionCarsExploitationReportActivated(object sender, EventArgs e)
+    {
+        tdiMain.OpenTab(
+            QSReport.ReportViewDlg.GenerateHashName<CarsExploitationReport>(),
+            () => new QSReport.ReportViewDlg(new CarsExploitationReport())
+        );
+    }
 }
